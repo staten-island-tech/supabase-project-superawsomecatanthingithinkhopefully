@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1 class="text-blue-600">kjhgadsfjhy</h1>
-    <button class="btn btn-secondary"></button>
+    <button class="btn btn-secondary">laksjdhfgf</button>
   </div>
 </template>
 
