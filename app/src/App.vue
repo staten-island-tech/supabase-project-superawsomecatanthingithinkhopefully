@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <h1 class="text-blue-600">Welcome to CONQUEST</h1>
+  <!-- <h1 class="text-blue-600">Welcome to CONQUEST</h1>
 
     <form action="" class="form" @submit.prevent="submit()">
       <label for="username">Username:</label>
@@ -10,16 +9,9 @@
       <div>
         <button type="submit" class="btn">Log In</button>
       </div>
-    </form>
-  </div>
+    </form> -->
 </template>
 
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import { reactive } from 'vue'
-function submit() {
-  console.log('Mathias Papias')
-}
-</script>
+<script setup></script>
 
 <style scoped></style>

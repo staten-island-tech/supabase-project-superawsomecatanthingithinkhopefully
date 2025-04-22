@@ -59,15 +59,22 @@
       </form>
 
       <p class="mt-10 text-center text-sm/6 text-gray-500">
-        Not a member?
-        <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500"
-          >Start a 14 day free trial</a
-        >
+        Don't Have an Account?
+        <nav>
+          <RouterLink to="/about">Click Me</RouterLink>
+        </nav>
       </p>
     </div>
   </div>
+  
 </template>
 
-<script setup></script>
+<script setup>
+import { RouterLink, RouterView } from 'vue-router'
+import { reactive } from 'vue'
+function submit() {
+  console.log('Mathias Papias')
+}
+</script>
 
 <style scoped></style>
