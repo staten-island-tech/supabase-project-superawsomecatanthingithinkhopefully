@@ -60,21 +60,16 @@
 
       <p class="mt-10 text-center text-sm/6 text-gray-500">
         Don't Have an Account?
-        <nav>
-          <RouterLink to="/about">Click Me</RouterLink>
-        </nav>
+
+        <RouterLink to="/about">Click Me</RouterLink>
       </p>
     </div>
   </div>
-  
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import { reactive } from 'vue'
-function submit() {
-  console.log('Mathias Papias')
-}
 </script>
 
 <style scoped></style>

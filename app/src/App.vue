@@ -10,8 +10,9 @@
         <button type="submit" class="btn">Log In</button>
       </div>
     </form> -->
+  <RouterView />
 </template>
 
-<script setup></script>
+<script setup lang="ts"></script>
 
 <style scoped></style>
