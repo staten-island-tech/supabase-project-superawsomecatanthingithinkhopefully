@@ -22,14 +22,13 @@ import { supabase } from '@/lib/supabaseClient.ts'
 interface profiles {
   // replace with the real stuff from instrumens table
   id: number
-  name: string
-  type: string
+  username: string
 }
 
 const profiles = ref<profiles[]>([])
 
 async function getprofiles() {
-  const { data, error } = await supabase.from('profiles').select('id')
+  const { data, error } = await supabase.from('profiles').select('id,username')
 
   if (error) {
     console.error('Error fetching instruments:', error)
