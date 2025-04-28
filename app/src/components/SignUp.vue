@@ -15,11 +15,7 @@ async function handleSignup() {
       .from('profiles')
       .insert([{ id: result.data.user?.id, username: signupStore.username }])
 
-    if (insertError) {
-      console.error('Error inserting into profiles:', insertError)
-    } else {
-      router.push('/dashboard')
-    }
+    
   }
 }
 </script>
@@ -47,6 +43,7 @@ async function handleSignup() {
     <button type="submit" class="bg-blue-600 text-white py-2 rounded">
       Sign Up
     </button>
+    <form action=""></form>
     <div v-if="signupStore.error" class="text-red-500">
       {{ signupStore.error }}
     </div>
