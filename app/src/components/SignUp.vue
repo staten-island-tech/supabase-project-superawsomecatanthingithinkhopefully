@@ -27,11 +27,7 @@ async function handleSignup() {
 <template>
   <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <img
-        class="mx-auto h-10 w-auto"
-        src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-        alt="Your Company"
-      />
+      <img class="mx-auto h-10 w-auto" src="/logo.jpg" alt="Your Company" />
       <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
         Create A New Account
       </h2>
@@ -59,6 +55,7 @@ async function handleSignup() {
             <input
               v-model="signupStore.email"
               type="email"
+              placeholder="Email"
               name="email"
               id="email"
               autocomplete="email"
@@ -76,6 +73,7 @@ async function handleSignup() {
             <input
               v-model="signupStore.password"
               type="password"
+              placeholder="Password"
               name="password"
               id="password"
               autocomplete="current-password"
