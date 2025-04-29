@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSignupStore } from '@/stores/signup'
+import { useSignupStore } from '@/stores/authuser'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabaseClient'
 const signupStore = useSignupStore()
