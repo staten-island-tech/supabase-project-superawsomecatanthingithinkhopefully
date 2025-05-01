@@ -58,15 +58,19 @@
         <div v-if="signupStore.error" class="text-red-500">
           {{ signupStore.error }}
         </div>
+        
       </form>
+      <RouterLink to="/signup ">Don't have an account Dign up?</RouterLink>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useSignupStore } from '@/stores/authuser'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabaseClient'
+import { RouterLink } from 'vue-router'
+
 const signupStore = useSignupStore()
 async function handleLog(){
   const result = await signupStore.login()

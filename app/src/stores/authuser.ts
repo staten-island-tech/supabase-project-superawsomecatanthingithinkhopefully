@@ -50,6 +50,7 @@ export const useSignupStore = defineStore('signup', () => {
 
   return {
     username,
+    
     email,
     password,
     error,

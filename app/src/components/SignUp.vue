@@ -1,24 +1,4 @@
-<script setup lang="ts">
-import { useSignupStore } from '@/stores/authuser'
-import { useRouter } from 'vue-router'
-import { supabase } from '@/lib/supabaseClient'
-const signupStore = useSignupStore()
-const router = useRouter()
 
-async function handleSignup() {
-  const result = await signupStore.signup()
-
-  if (result.error) {
-    console.error(result.error)
-  } else {
-    const { data, error: insertError } = await supabase
-      .from('profiles')
-      .insert([{ id: result.data.user?.id, username: signupStore.username }])
-
-    
-  }
-}
-</script>
 
 <template>
   <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -96,3 +76,25 @@ async function handleSignup() {
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { useSignupStore } from '@/stores/authuser'
+import { useRouter } from 'vue-router'
+import { supabase } from '@/lib/supabaseClient'
+import { onMounted } from 'vue'
+const signupStore = useSignupStore()
+const router = useRouter()
+
+async function handleSignup() {
+  const result = await signupStore.signup()
+
+  if (result.error) {
+    console.error(result.error)
+  } else {
+    const { data, error: insertError } = await supabase
+      .from('profiles')
+      .insert([{ id: result.data.user?.id, username: signupStore.username }])
+
+    
+  }
+}
+</script>
