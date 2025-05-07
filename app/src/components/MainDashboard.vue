@@ -1,6 +1,7 @@
 <template>
     <div>
-
+      <button>Join a game</button>
+      <button>Create a room</button>
     </div>
 </template>
 
@@ -8,17 +9,11 @@
 import { useSignupStore } from '@/stores/authuser'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabaseClient'
-const myChannel = supabase.channel('test-channel')
+const messageChannel = supabase.channel('message-channel')
 
 
 
-myChannel
-  .on(
-    'broadcast',
-    { event: 'INSERT' }, 
-    (payload) => messageReceived(payload)
-  )
-  .subscribe()
+
 </script>
 
 <style scoped>

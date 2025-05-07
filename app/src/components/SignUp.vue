@@ -90,11 +90,14 @@ async function handleSignup() {
   if (result.error) {
     console.error(result.error)
   } else {
+    console.log('User ID:', signupStore.username)
+
     const { data, error: insertError } = await supabase
       .from('profiles')
       .insert([{ id: result.data.user?.id, username: signupStore.username }])
+      router.push({path:'/dash'})
 
-
+      
   }
   
 }

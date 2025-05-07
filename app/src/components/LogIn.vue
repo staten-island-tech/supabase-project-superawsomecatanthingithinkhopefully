@@ -60,7 +60,7 @@
         </div>
         
       </form>
-      <RouterLink to="/signup ">Don't have an account Dign up?</RouterLink>
+      <RouterLink to="/signup">Don't have an account Dign up?</RouterLink>
     </div>
   </div>
 </template>
@@ -70,14 +70,16 @@ import { useSignupStore } from '@/stores/authuser'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabaseClient'
 import { RouterLink } from 'vue-router'
-
+const router = useRouter()
 const signupStore = useSignupStore()
 async function handleLog(){
   const result = await signupStore.login()
   if (!result.error){
-    alert("word")
+
+    router.push({path:'/dash'})
   }
-  location.reload()
+  
+  
 }
 </script>
 

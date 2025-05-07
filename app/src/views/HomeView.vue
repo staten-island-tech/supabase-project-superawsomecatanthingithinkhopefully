@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import LogIn from '@/components/LogIn.vue';
-import SignUp from '@/components/SignUp.vue';
+
 
 </script>
 
