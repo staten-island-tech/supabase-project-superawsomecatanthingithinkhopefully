@@ -1,7 +1,7 @@
 <template>
     <div>
       <button>Join a game</button>
-      <button>Create a room</button>
+      <button @click="" class="flex justify-center">Create a room</button>
     </div>
 </template>
 

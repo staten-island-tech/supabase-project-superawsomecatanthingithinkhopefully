@@ -8,7 +8,7 @@
         src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
         alt="Your Company"
       />
-      <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
+      <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-black">
         Create A New Account
       </h2>
     </div>
@@ -16,7 +16,7 @@
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form @submit.prevent="handleSignup" class="space-y-6" action="#" method="POST">
         <div>
-          <label for="username" class="block text-sm/6 font-medium text-white">Username</label>
+          <label for="username" class="block text-sm/6 font-medium text-black">Username</label>
           <div class="mt-2">
             <input
               v-model="signupStore.username"
@@ -24,13 +24,13 @@
               placeholder="Username"
               id="username"
               required
-              class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-black outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
             />
           </div>
         </div>
 
         <div>
-          <label for="email" class="block text-sm/6 font-medium text-white">Email address</label>
+          <label for="email" class="block text-sm/6 font-medium text-black">Email address</label>
           <div class="mt-2">
             <input
               v-model="signupStore.email"
@@ -39,14 +39,14 @@
               id="email"
               autocomplete="email"
               required
-              class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-black outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
             />
           </div>
         </div>
 
         <div>
           <div class="flex items-center justify-between">
-            <label for="password" class="block text-sm/6 font-medium text-white">Password</label>
+            <label for="password" class="block text-sm/6 font-medium text-black">Password</label>
           </div>
           <div class="mt-2">
             <input
@@ -56,7 +56,7 @@
               id="password"
               autocomplete="current-password"
               required
-              class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-black outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
             />
           </div>
         </div>
@@ -64,7 +64,7 @@
         <div>
           <button
             type="submit"
-            class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-black shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Create Account
           </button>
@@ -90,12 +90,11 @@ async function handleSignup() {
   if (result.error) {
     console.error(result.error)
   } else {
-    console.log('User ID:', signupStore.username)
-
     const { data, error: insertError } = await supabase
       .from('profiles')
       .insert([{ id: result.data.user?.id, username: signupStore.username }])
       router.push({path:'/dash'})
+
 
       
   }
