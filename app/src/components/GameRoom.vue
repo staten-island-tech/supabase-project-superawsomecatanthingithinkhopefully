@@ -1,6 +1,6 @@
 <template>
     <div>
-<p>you made it !</p>
+<p>YOU DID IT!</p>
     </div>
 </template>
 

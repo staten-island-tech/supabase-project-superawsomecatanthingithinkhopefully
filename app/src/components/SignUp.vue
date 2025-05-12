@@ -8,7 +8,7 @@
         src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
         alt="Your Company"
       />
-      <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-black">
+      <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
         Create A New Account
       </h2>
     </div>
@@ -16,7 +16,7 @@
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form @submit.prevent="handleSignup" class="space-y-6" action="#" method="POST">
         <div>
-          <label for="username" class="block text-sm/6 font-medium text-black">Username</label>
+          <label for="username" class="block text-sm/6 font-medium text-white">Username</label>
           <div class="mt-2">
             <input
               v-model="signupStore.username"
@@ -30,7 +30,7 @@
         </div>
 
         <div>
-          <label for="email" class="block text-sm/6 font-medium text-black">Email address</label>
+          <label for="email" class="block text-sm/6 font-medium text-white">Email address</label>
           <div class="mt-2">
             <input
               v-model="signupStore.email"
@@ -46,7 +46,7 @@
 
         <div>
           <div class="flex items-center justify-between">
-            <label for="password" class="block text-sm/6 font-medium text-black">Password</label>
+            <label for="password" class="block text-sm/6 font-medium text-white">Password</label>
           </div>
           <div class="mt-2">
             <input
