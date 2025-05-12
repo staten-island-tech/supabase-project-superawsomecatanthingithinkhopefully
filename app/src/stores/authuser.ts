@@ -29,12 +29,34 @@ export const useSignupStore = defineStore('signup', () => {
 
     return { data: result.data, error: result.error }
   }
+  async function login() {
+    const result = await supabase.auth.signInWithPassword({
+      email: email.value,
+      password: password.value,
+      
+    })
+  
+    if (result.error) {
+      error.value = result.error.message
+      console.log("bruh")
+    } else {
+      error.value = null
+      isLoggedIn.value=true
+      console.log(" yeah u logged in")
+    }
+  
+    return { data: result.data, error: result.error }
+  }
 
   return {
     username,
+    
     email,
     password,
     error,
-    signup
+    signup,
+    login,
   }
 })
+
+
