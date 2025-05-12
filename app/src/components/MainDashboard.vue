@@ -1,7 +1,17 @@
 <template>
     <div>
       <button>Join a game</button>
-      <button @click="" class="flex justify-center">Create a room</button>
+      
+      <form @submit.prevent="handleRoom">
+    <input 
+      type="number" 
+      v-model.number="use_rooms.number_player" 
+      required 
+      min="1" 
+      placeholder="Number of players" 
+    />
+    <button type="submit">Create Room</button>
+  </form>
     </div>
 </template>
 
@@ -9,9 +19,18 @@
 import { useSignupStore } from '@/stores/authuser'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabaseClient'
-const messageChannel = supabase.channel('message-channel')
-
-
+import { rooms } from '@/stores/rooms'
+import routers from '@/router'
+const use_rooms = rooms()
+const router = useRouter()
+async function handleRoom(){
+  const result = await use_rooms.makeRoom()
+  console.log(use_rooms.number_player)
+  if(result){
+    router.push({path:`/${result['id']}`})
+  }
+  
+}
 
 
 </script>
