@@ -6,15 +6,11 @@
         src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
         alt="Your Company"
       />
-      <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
-        log
-      </h2>
+      <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">log</h2>
     </div>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form @submit.prevent="handleLog" class="space-y-6" action="#" method="POST">
-        
-
         <div>
           <label for="email" class="block text-sm/6 font-medium text-white">Email address</label>
           <div class="mt-2">
@@ -58,7 +54,6 @@
         <div v-if="signupStore.error" class="text-red-500">
           {{ signupStore.error }}
         </div>
-        
       </form>
       <RouterLink to="/signup">Don't have an account Dign up?</RouterLink>
     </div>
@@ -72,17 +67,12 @@ import { supabase } from '@/lib/supabaseClient'
 import { RouterLink } from 'vue-router'
 const router = useRouter()
 const signupStore = useSignupStore()
-async function handleLog(){
+async function handleLog() {
   const result = await signupStore.login()
-  if (!result.error){
-
-    router.push({path:'/dash'})
+  if (!result.error) {
+    router.push({ path: '/dash' })
   }
-  
-  
 }
 </script>
 
-<style  scoped>
-
-</style>
+<style scoped></style>
