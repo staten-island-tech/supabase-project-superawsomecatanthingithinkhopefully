@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-theme="synthwave" class="min-h-screen">
     <p>YOU DID IT!</p>
   </div>
 </template>

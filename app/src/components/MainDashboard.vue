@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div data-theme="synthwave" class="min-h-screen">
       <button>Join a game</button>
       
       <form @submit.prevent="handleRoom">
