@@ -29,6 +29,11 @@ const router = createRouter({
       name:'game',
       component:GameRoom,
     },
+    {
+      path: '/HomePage',
+      name: 'HomePage',
+      component: () => import('@/views/HomePage.vue')
+    },
   ],
 })
 

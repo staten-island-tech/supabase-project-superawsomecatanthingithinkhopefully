@@ -1,14 +1,9 @@
 <template>
-    <div>
-        <p>YOU DID IT!</p>
-    </div>
+  <div>
+    <p>YOU DID IT!</p>
+  </div>
 </template>
 
+<script setup lang="ts"></script>
 
-<script setup lang="ts">
-
-</script>
-
-<style scoped>
-
-</style>
+<style scoped></style>
