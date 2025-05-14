@@ -3,7 +3,9 @@
     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div class="sm:mx-auto sm:w-full sm:max-w-sm">
         <img class="mx-auto h-50 w-auto" src="/Logo.png" alt="Your Company" />
-        <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">log</h2>
+        <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
+          Console.Log In
+        </h2>
       </div>
 
       <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -16,6 +18,7 @@
                 type="email"
                 name="email"
                 id="email"
+                placeholder="Email"
                 autocomplete="email"
                 required
                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-black outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -33,6 +36,7 @@
                 type="password"
                 name="password"
                 id="password"
+                placeholder="Password"
                 autocomplete="current-password"
                 required
                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-black outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -52,7 +56,7 @@
             {{ signupStore.error }}
           </div>
         </form>
-        <RouterLink to="/signup">Don't have an account Dign up?</RouterLink>
+        <RouterLink to="/signup">Don't have an account Sign up?</RouterLink>
       </div>
     </div>
   </div>
