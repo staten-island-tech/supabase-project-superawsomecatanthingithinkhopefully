@@ -14,7 +14,7 @@
             <label for="email" class="block text-sm/6 font-medium text-white">Email address</label>
             <div class="mt-2">
               <input
-                v-model="signupStore.email"
+                v-model="signupStore.user_info.email"
                 type="email"
                 name="email"
                 id="email"
@@ -32,7 +32,7 @@
             </div>
             <div class="mt-2">
               <input
-                v-model="signupStore.password"
+                v-model="signupStore.user_info.password"
                 type="password"
                 name="password"
                 id="password"

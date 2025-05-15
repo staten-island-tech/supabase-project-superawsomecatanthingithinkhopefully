@@ -12,27 +12,42 @@
     />
     <button type="submit">Create Room</button>
   </form>
+  <button v-for="data in fetched_data" @click="joinRoom(data.id)">Join Game {{ data.id }}</button>
     </div>
 </template>
 
 <script setup lang="ts">
-import { useSignupStore } from '@/stores/authuser'
+import type {RoomInfo} from '@/types/types.ts'
 import { useRouter } from 'vue-router'
-import { supabase } from '@/lib/supabaseClient'
+
 import { rooms } from '@/stores/rooms'
-import routers from '@/router'
+
+import { onMounted,ref } from 'vue'
+import { join } from 'path'
+
 const use_rooms = rooms()
 const router = useRouter()
 async function handleRoom(){
+
   const result = await use_rooms.makeRoom()
   console.log(use_rooms.number_player)
   if(result){
-    router.push({path:`/${result['id']}`})
+    router.push({path:`/${result.id}`})
   }
   
 }
+const fetched_data = ref<RoomInfo[]|undefined>([])
+onMounted(async ()=>{
+  const data = await use_rooms.fetchRooms()
+  fetched_data.value = data
+})
+async function joinRoom(id:string){
 
-
+  
+  router.push({path:`/${id}`})
+  
+  
+}
 </script>
 
 <style scoped>

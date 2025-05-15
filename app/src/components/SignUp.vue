@@ -14,7 +14,7 @@
             <label for="username" class="block text-sm/6 font-medium text-white">Username</label>
             <div class="mt-2">
               <input
-                v-model="signupStore.username"
+                v-model="signupStore.user_info.username"
                 type="text"
                 placeholder="Username"
                 id="username"
@@ -28,7 +28,7 @@
             <label for="email" class="block text-sm/6 font-medium text-white">Email address</label>
             <div class="mt-2">
               <input
-                v-model="signupStore.email"
+                v-model="signupStore.user_info.email"
                 type="email"
                 name="email"
                 id="email"
@@ -46,7 +46,7 @@
             </div>
             <div class="mt-2">
               <input
-                v-model="signupStore.password"
+                v-model="signupStore.user_info.password"
                 type="password"
                 name="password"
                 id="password"
@@ -90,7 +90,7 @@ async function handleSignup() {
   } else {
     const { data, error: insertError } = await supabase
       .from('profiles')
-      .insert([{ id: result.data.user?.id, username: signupStore.username }])
+      .insert([{ id: result.data.user?.id, username: signupStore.user_info.password }])
     router.push({ path: '/dash' })
   }
 }

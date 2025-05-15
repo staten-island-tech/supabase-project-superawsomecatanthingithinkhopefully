@@ -10,17 +10,14 @@ export const rooms = defineStore('rooms', () => {
  
   async function makeRoom() {
     const {data:{user}, error:authError} = await supabase.auth.getUser()
-    console.log(user)
+
     if (authError||!user){
         console.log(authError,user)
         return null;
     }
     
     else{console.log(user.id)}
-    console.log('Inserting row:', {
-        number_player: number_player.value,
-        user_id: user
-      });
+    
     const {data,error} = await supabase.from('game').insert([{number_player:number_player.value,user_id:user.id}]).select()
 
     if (error&&!data){
@@ -34,14 +31,34 @@ export const rooms = defineStore('rooms', () => {
             return {id:id.value}
         }
     }
-    return null
+    
 }
+  async function fetchRooms(){
+    const {data,error} = await supabase.from('game').select('*')
+    if (!data|| error){
+      console.log(":(")
+    }
+    else{
+      console.log(data)
+      return data
+    }
+    
+  }
+  async function deleteRoom(id:string){
+    console.log(3)
+    const deleted_room = await supabase.from('game').delete().eq('id',id)
+    const select_room = await supabase.from('game').select().eq('id',id)
+    console.log(select_room)
+  }
+  
   
   
   return {
     id,
     makeRoom,
     number_player,
+    fetchRooms,
+    deleteRoom,
   }
 })
 
