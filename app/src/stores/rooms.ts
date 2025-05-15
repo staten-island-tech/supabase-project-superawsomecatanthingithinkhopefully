@@ -7,16 +7,18 @@ import { supabase } from '@/lib/supabaseClient'
 export const rooms = defineStore('rooms', () => {
   const id = ref<string>('')
   const number_player = ref<number>(4)
+  const user_id = ref<string>('')
+
  
   async function makeRoom() {
     const {data:{user}, error:authError} = await supabase.auth.getUser()
-
+    
     if (authError||!user){
         console.log(authError,user)
         return null;
     }
     
-    else{console.log(user.id)}
+    else{user_id.value = user?.id}
     
     const {data,error} = await supabase.from('game').insert([{number_player:number_player.value,user_id:user.id}]).select()
 
@@ -45,10 +47,13 @@ export const rooms = defineStore('rooms', () => {
     
   }
   async function deleteRoom(id:string){
-    console.log(3)
+
     const deleted_room = await supabase.from('game').delete().eq('id',id)
     const select_room = await supabase.from('game').select().eq('id',id)
-    console.log(select_room)
+    return select_room
+  }
+  async function autoDelete(){
+    
   }
   
   
@@ -57,6 +62,7 @@ export const rooms = defineStore('rooms', () => {
     id,
     makeRoom,
     number_player,
+    user_id,
     fetchRooms,
     deleteRoom,
   }
