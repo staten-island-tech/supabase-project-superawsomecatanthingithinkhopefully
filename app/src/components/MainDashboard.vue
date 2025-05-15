@@ -41,6 +41,7 @@ async function handleRoom() {
 }
 onMounted(() => {
   console.log(1)
+
   gsap.to('.green', { rotation: 360, x: 100, duration: 1 })
 
   // target the element with a class of "purple" - rotate and move FROM 100px to the left over the course of 1 second.
