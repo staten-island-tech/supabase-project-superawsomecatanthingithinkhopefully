@@ -50,6 +50,9 @@ export const rooms = defineStore('rooms', () => {
     const select_room = await supabase.from('game').select().eq('id',id)
     console.log(select_room)
   }
+  async function leaveUser() {
+    
+  }
   
   
   
