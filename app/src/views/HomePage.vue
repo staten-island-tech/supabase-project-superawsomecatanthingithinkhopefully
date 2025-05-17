@@ -1,7 +1,20 @@
 <template>
-  <div class="box gradient-green green"></div>
+  <!-- <div class="box gradient-green green"></div>
   <div class="box gradient-purple purple"></div>
-  <div class="box gradient-blue blue"></div>
+  <div class="box gradient-blue blue"></div> -->
+  <div class="static">
+
+    <div class="logo absolute bottom-200 left-99">
+      <h2>WELCOME</h2>
+    </div>
+
+    <div class="logo absolute bottom-200 left-99">
+      <img src="/Logo.png" alt="Enhancing_Logo">
+    </div>
+    
+
+  </div>
+  
 </template>
 
 <script setup lang="ts">
