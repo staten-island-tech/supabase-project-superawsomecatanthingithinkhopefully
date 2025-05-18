@@ -1,22 +1,61 @@
 <template>
   <div data-theme="synthwave" class="min-h-screen">
-    <div class="box gradient-green green"></div>
-    <div class="box gradient-purple purple"></div>
-    <div class="box gradient-blue blue"></div>
+    <!-- <div class="static">
 
-    <div>
-      <button>Join a game</button>
+      <div class="woman_in absolute bottom-120 left-99">
+        <h2>WELCOME</h2>
+      </div>
 
-      <form @submit.prevent="handleRoom">
-        <input
-          type="number"
-          v-model.number="use_rooms.number_player"
-          required
-          min="1"
-          placeholder="Number of players"
-        />
-        <button type="submit">Create Room</button>
-      </form>
+      <div class="New_Mexico absolute bottom-150 left-99">
+        <h2>To</h2>
+      </div>
+
+      <div class="logo absolute bottom-200 left-99">
+        <img src="/Logo.png" alt="Enhancing_Logo">
+      </div>
+    
+
+    </div> -->
+
+    <div class="static">
+
+      <div class="avatar absolute top-5 right-5">
+        <div class="w-24 rounded-full">
+          <RouterLink to="/AccountStuff"><img src="/profile_temp.jpg" alt="profile_pic"/></RouterLink>
+          
+        </div>
+        
+      </div>
+      <div class="absolute top-30 right-5">
+        <h2>Account Name Here</h2>
+      </div>
+      
+
+
+      <div class="absolute bottom-80 left-133">
+        <img class='h-60 w-60' src="/Logo.png" alt="Temp">
+
+      </div>
+      <button class="absolute bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game</button>
+
+      <div class="glass absolute bottom-20 left 0 w-100 h-125">
+        <h2 class="absolute bottom-110 left-30 text-2xl font-bold underline">Private Match</h2>
+
+        <form @submit.prevent="handleRoom">
+          <h3 class="absolute bottom-90 left-10">Players:</h3>
+          <input
+            class="absolute bottom-80 left-20"
+            type="number"
+            v-model.number="use_rooms.number_player"
+            required
+            min="1"
+            placeholder="Number of players"
+          />
+          <button class="absolute bottom-5 left-25 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" type="submit">Create Room</button>
+        </form>
+
+      </div>
+      
     </div>
   </div>
 </template>
@@ -42,13 +81,7 @@ async function handleRoom() {
 onMounted(() => {
   console.log(1)
 
-  gsap.to('.green', { rotation: 360, x: 100, duration: 1 })
-
-  // target the element with a class of "purple" - rotate and move FROM 100px to the left over the course of 1 second.
-  gsap.from('.purple', { rotation: -360, x: -100, duration: 1 })
-
-  // target the element with a class of "blue" - rotate and move FROM 100px to the left, TO 100px to the right over the course of 1 second.
-  gsap.fromTo('.blue', { x: -100 }, { rotation: 360, x: 100, duration: 1 })
+  
 })
 </script>
 
