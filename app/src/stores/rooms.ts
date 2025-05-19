@@ -55,6 +55,9 @@ export const rooms = defineStore('rooms', () => {
   async function autoDelete(){
     
   }
+  async function leaveUser() {
+    
+  }
   
   
   

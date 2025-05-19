@@ -1,9 +1,10 @@
 <template>
   <div data-theme="synthwave" class="min-h-screen">
-    <p>YOU DID IT! {{ router.params.gameid }}</p>
+    
     <button @click="handleDeletion()" v-if="use_rooms.id == use_rooms.user_id">delete room</button>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { supabase } from '@/lib/supabaseClient';
@@ -24,4 +25,6 @@ async function handleDeletion(){
 }
 </script>
 
-<style scoped></style>
+<style  scoped>
+
+</style>
