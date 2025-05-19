@@ -12,7 +12,7 @@ export const homePage = defineStore('homePage', () => {
         
         const {data,error} = await supabase.from('profiles').select().eq('id',userid.user)
     }
-    
+
     
     
     return {
