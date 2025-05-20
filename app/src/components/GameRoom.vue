@@ -14,9 +14,10 @@ const router = useRoute()
 const routers = useRouter()
 const use_rooms = rooms()
 async function handleDeletion(){
- 
-    const route_id = router.params.gameid as string
-    const leave = await use_rooms.deleteRoom(route_id)
+  console.log(1)
+  
+  const route_id = router.params.gameid as string
+  const leave = await use_rooms.deleteRoom(route_id)
   
   
   

@@ -32,7 +32,15 @@ export const useSignupStore = defineStore('signup', () => {
     if (result.error) {
       error.value = result.error.message
     } else {
-      error.value = null
+      console.log(user_info.username)
+      const{data:testdata,error:testerror} = await supabase.auth.getUser()
+      
+      if (testdata.user != null){
+        console.log(testdata.user.id)
+        const {data, error } = await supabase.from('profiles').update({username:user_info.username}).eq('id',testdata.user?.id).select()
+        return data
+      }
+      
     }
 
     return { data: result.data, error: result.error }
@@ -50,7 +58,7 @@ export const useSignupStore = defineStore('signup', () => {
     } else {
       error.value = null
       isLoggedIn.value=true
-      console.log(" yeah u logged in")
+      console.log(user_info.username)
     }
   
     return { data: result.data, error: result.error }

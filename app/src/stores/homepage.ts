@@ -6,16 +6,29 @@ export const homePage = defineStore('homePage', () => {
 
     async function fetchUserData(){
         const {data:userid,error:id_error} = await supabase.auth.getUser()
-        if (userid == null){
-            console.log(id_error)
+
+        if (userid.user == null){
+            // console.log(id_error)
+            
+        }
+        else{
+            
+            const {data,error} = await supabase.from('profiles').select().eq('id',userid.user.id)
+        if (data){
+            // console.log(data)
+        }
+            
+
+        return data
         }
         
-        const {data,error} = await supabase.from('profiles').select().eq('id',userid.user)
+        
+        
     }
 
     
     
     return {
-
+        fetchUserData,
     }
   })

@@ -27,7 +27,7 @@
         
       </div>
       <div class="absolute top-30 right-5">
-        <h2>Account Name Here</h2>
+        <h2>{{user_info}}</h2>
       </div>
       
 
@@ -35,11 +35,19 @@
       <div class="absolute bottom-80 left-133">
         <img class='h-60 w-60' src="/Logo.png" alt="Temp">
 
+<<<<<<< Updated upstream
       </div v-for="">
       <button  class="absolute bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game</button>
+=======
+      </div>
+      <div v-for="data in fetched_data">
+        
+          <button @click="joinRoom(data.id)" class=" absolute bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game. </button>
+      </div>
+>>>>>>> Stashed changes
 
       <div class="glass absolute bottom-20 left 0 w-100 h-125">
-        <h2 class="absolute bottom-110 left-30 text-2xl font-bold underline">Private Match</h2>
+        <h2 class="absolute bottom-110 left-30 text-2xl font-bold underline">Create Room</h2>
 
         <form @submit.prevent="handleRoom">
           <h3 class="absolute bottom-90 left-10">Players:</h3>
@@ -67,10 +75,13 @@ import { useSignupStore } from '@/stores/authuser'
 import { useRouter } from 'vue-router'
 import { type RoomInfo } from '@/types/types'
 import { rooms } from '@/stores/rooms'
+import { homePage } from '@/stores/homepage'
 import routers from '@/router'
 import { onMounted,ref } from 'vue'
 
 const use_rooms = rooms()
+const use_user = homePage()
+const user_info = use_user.fetchUserData()
 const router = useRouter()
 async function handleRoom() {
   const result = await use_rooms.makeRoom()
@@ -83,6 +94,7 @@ const fetched_data = ref<RoomInfo[]|undefined>([])
 onMounted(async ()=>{
   const data = await use_rooms.fetchRooms()
   fetched_data.value = data
+  console.log(fetched_data.value)
 })
 async function joinRoom(id:string){
 
@@ -91,11 +103,7 @@ async function joinRoom(id:string){
   
   
 }
-onMounted(() => {
-  console.log(1)
 
-  
-})
 </script>
 
 <style scoped>
