@@ -42,6 +42,7 @@ export const useSignupStore = defineStore('signup', () => {
       }
       
     }
+    
 
     return { data: result.data, error: result.error }
   }
