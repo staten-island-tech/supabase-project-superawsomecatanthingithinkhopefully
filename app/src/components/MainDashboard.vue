@@ -35,8 +35,8 @@
       <div class="absolute bottom-80 left-133">
         <img class='h-60 w-60' src="/Logo.png" alt="Temp">
 
-      </div>
-      <button class="absolute bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game</button>
+      </div v-for="">
+      <button  class="absolute bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game</button>
 
       <div class="glass absolute bottom-20 left 0 w-100 h-125">
         <h2 class="absolute bottom-110 left-30 text-2xl font-bold underline">Private Match</h2>
