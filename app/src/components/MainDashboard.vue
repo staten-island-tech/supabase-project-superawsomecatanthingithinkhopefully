@@ -17,29 +17,29 @@
 
     </div> -->
 
-    <div class="static">
-
+    <div class="relative">
       <div class="avatar absolute top-5 right-5">
         <div class="w-24 rounded-full">
-          <RouterLink to="/AccountStuff"><img src="/profile_temp.jpg" alt="profile_pic"/></RouterLink>
-          
+          <RouterLink to="/AccountStuff"
+            ><img src="/profile_temp.jpg" alt="profile_pic"
+          /></RouterLink>
         </div>
-        
       </div>
       <div class="absolute top-30 right-5">
         <h2>Account Name Here</h2>
       </div>
-      
 
-
-      <div class="absolute bottom-80 left-133">
-        <img class='h-60 w-60' src="/Logo.png" alt="Temp">
-
+      <div class="absolute top-[10vw] right-[40vw]">
+        <img class="h-96 w-96" src="/Logo.png" alt="Temp" />
       </div>
-      <button class="absolute bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game</button>
+      <button
+        class="absolute top-[30vw] right-[46vw] bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full"
+      >
+        Join a game
+      </button>
 
-      <div class="glass absolute bottom-20 left 0 w-100 h-125">
-        <h2 class="absolute bottom-110 left-30 text-2xl font-bold underline">Private Match</h2>
+      <div class="glass absolute top-20 left-0 w-[30vw] h-[40vw]">
+        <h2 class="absolute top-0 left-[7vw] text-2xl font-bold underline">Private Match</h2>
 
         <form @submit.prevent="handleRoom">
           <h3 class="absolute bottom-90 left-10">Players:</h3>
@@ -51,11 +51,14 @@
             min="1"
             placeholder="Number of players"
           />
-          <button class="absolute bottom-5 left-25 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" type="submit">Create Room</button>
+          <button
+            class="absolute bottom-5 left-25 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+            type="submit"
+          >
+            Create Room
+          </button>
         </form>
-
       </div>
-      
     </div>
   </div>
 </template>
@@ -80,14 +83,7 @@ async function handleRoom() {
 }
 onMounted(() => {
   console.log(1)
-
-  
 })
 </script>
 
-<style scoped>
-.box {
-  width: 500px;
-  height: 500px;
-}
-</style>
+<style scoped></style>
