@@ -44,6 +44,9 @@
         
           <button @click="joinRoom(data.id)" class=" absolute bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game. </button>
       </div>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
       <div class="glass absolute bottom-20 left 0 w-100 h-125">
