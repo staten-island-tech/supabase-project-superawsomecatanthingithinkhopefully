@@ -85,8 +85,8 @@ const router = useRouter()
 async function handleSignup() {
   const result = await signupStore.signup()
 
-  if (result.error) {
-    console.error(result.error)
+  if (!result) {
+    console.error(signupStore.error)
   } else {
     const { data, error: insertError } = await supabase
       .from('profiles')

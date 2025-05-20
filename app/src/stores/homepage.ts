@@ -13,7 +13,7 @@ export const homePage = defineStore('homePage', () => {
         }
         else{
             
-            const {data,error} = await supabase.from('profiles').select().eq('id',userid.user.id)
+            const {data,error} = await supabase.from('profiles').select().eq('id',userid.user.id) 
         if (data){
             // console.log(data)
         }
