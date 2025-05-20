@@ -37,7 +37,7 @@ export const useSignupStore = defineStore('signup', () => {
       
       if (testdata.user != null){
         console.log(testdata.user.id)
-        const {data, error } = await supabase.from('profiles').update({username:user_info.username}).eq('id',testdata.user?.id).select()
+        const {data, error } = await supabase.from('profiles').upsert({username:user_info.username}).eq('id',testdata.user?.id).select()
         return data
       }
       

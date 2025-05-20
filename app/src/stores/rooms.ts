@@ -48,11 +48,10 @@ export const rooms = defineStore('rooms', () => {
     
   }
   async function deleteRoom(id:string){
-    const select_room = await supabase.from('game').select().eq('id',id)
-
+   
     const deleted_room = await supabase.from('game').delete().eq('id',id)
-    console.log(select_room)
-    return select_room
+    
+
   }
   async function autoDelete(){
     
