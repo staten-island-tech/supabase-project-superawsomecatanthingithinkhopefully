@@ -4,6 +4,7 @@ import SignUp from '../components/SignUp.vue'
 import '../assets/main.css'
 import MainDashboard from '@/components/MainDashboard.vue'
 import GameRoom from '@/components/GameRoom.vue'
+import AccountStuff from '@/views/AccountStuff.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,9 +36,9 @@ const router = createRouter({
       component: () => import('@/views/HomePage.vue')
     },
     {
-      path: '/AccountStuff.vue',
+      path: '/AccountStuff',
       name: 'AccountStuff',
-      component: () => import('@/views/AccountStuff.vue')
+      component: AccountStuff
     },
   ],
 })
