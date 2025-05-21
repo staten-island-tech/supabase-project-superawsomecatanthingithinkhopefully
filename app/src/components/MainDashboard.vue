@@ -27,7 +27,7 @@
         
       </div>
       <div class="absolute top-30 right-5">
-        <h2>{{user_info}}</h2>
+        <h2 v-if="data">{{data.username}}</h2>
       </div>
       
 
@@ -35,19 +35,15 @@
       <div class="absolute bottom-80 left-133">
         <img class='h-60 w-60' src="/Logo.png" alt="Temp">
 
-<<<<<<< Updated upstream
       </div v-for="">
       <button  class="absolute bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game</button>
-=======
+
       </div>
       <div v-for="data in fetched_data">
         
           <button @click="joinRoom(data.id)" class=" absolute bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game. </button>
       </div>
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
 
       <div class="glass absolute bottom-20 left 0 w-100 h-125">
         <h2 class="absolute bottom-110 left-30 text-2xl font-bold underline">Create Room</h2>
@@ -76,7 +72,7 @@
 import { gsap } from 'gsap'
 import { useSignupStore } from '@/stores/authuser'
 import { useRouter } from 'vue-router'
-import { type RoomInfo } from '@/types/types'
+import { type profileType, type RoomInfo } from '@/types/types'
 import { rooms } from '@/stores/rooms'
 import { homePage } from '@/stores/homepage'
 import routers from '@/router'
@@ -84,7 +80,7 @@ import { onMounted,ref } from 'vue'
 
 const use_rooms = rooms()
 const use_user = homePage()
-const user_info = use_user.fetchUserData()
+
 const router = useRouter()
 async function handleRoom() {
   const result = await use_rooms.makeRoom()
@@ -94,10 +90,14 @@ async function handleRoom() {
   }
 }
 const fetched_data = ref<RoomInfo[]|undefined>([])
+const data = ref<profileType|null>(null)
 onMounted(async ()=>{
-  const data = await use_rooms.fetchRooms()
-  fetched_data.value = data
+  const user_info = await use_user.fetchUserData()
+  const room_data = await use_rooms.fetchRooms()
+  fetched_data.value = room_data
   console.log(fetched_data.value)
+  data.value = user_info 
+  
 })
 async function joinRoom(id:string){
 

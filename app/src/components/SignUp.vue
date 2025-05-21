@@ -79,18 +79,21 @@ import { useSignupStore } from '@/stores/authuser'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabaseClient'
 import { onMounted } from 'vue'
+import { type profileType } from '@/types/types'
 const signupStore = useSignupStore()
 const router = useRouter()
 
 async function handleSignup() {
   const result = await signupStore.signup()
 
-  if (!result) {
+  if (!result.data.user) {
     console.error(signupStore.error)
   } else {
+    console.log(result.data.user.id)
+    console.log(signupStore.user_info.username)
     const { data, error: insertError } = await supabase
       .from('profiles')
-      .insert([{ id: result.data.user?.id, username: signupStore.user_info.password }])
+      .upsert([{ id: result.data.user?.id, username: signupStore.user_info.username }])
     router.push({ path: '/dash' })
   }
 }

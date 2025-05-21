@@ -32,14 +32,11 @@ export const useSignupStore = defineStore('signup', () => {
     if (result.error) {
       error.value = result.error.message
     } else {
-      console.log(user_info.username)
-      const{data:testdata,error:testerror} = await supabase.auth.getUser()
-      
-      if (testdata.user != null){
-        console.log(testdata.user.id)
-        const {data, error } = await supabase.from('profiles').upsert({username:user_info.username}).eq('id',testdata.user?.id).select()
-        return data
-      }
+      // console.log(user_info.username)
+      // const userId = result.data.user
+      // if(userId){
+      //   const {data:profileData,error:profileError} = await supabase.from('profiles').update({username:user_info.username}).eq('id',userId.id).select()
+      // }
       
     }
     

@@ -4,3 +4,10 @@ export interface RoomInfo {
   number_player: number;
 
 }
+export interface profileType {
+  id: string;
+  username: string;
+  
+
+}
+
