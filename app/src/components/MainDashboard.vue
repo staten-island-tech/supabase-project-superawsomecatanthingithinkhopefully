@@ -20,9 +20,7 @@
     <div class="relative">
       <div class="avatar absolute top-5 right-5">
         <div class="w-24 rounded-full">
-          <RouterLink to="/AccountStuff"
-            ><img src="/profile_temp.jpg" alt="profile_pic"
-          /></RouterLink>
+          <RouterLink to="/AccountStuff"><img src="/fozzy.png" alt="profile_pic" /></RouterLink>
         </div>
       </div>
       <div class="absolute top-30 right-5">

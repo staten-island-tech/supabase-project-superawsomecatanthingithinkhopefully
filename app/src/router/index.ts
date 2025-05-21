@@ -29,7 +29,7 @@ const router = createRouter({
     {
       path:'/:gameid',
       name:'game',
-      component:GameRoom,
+      component: () => import('@/views/StartGame.vue'),
     },
     {
       path: '/HomePage',
