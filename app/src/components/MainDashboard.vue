@@ -30,11 +30,14 @@
       <div class="absolute top-[10vw] right-[40vw]">
         <img class="h-96 w-96" src="/Logo.png" alt="Temp" />
       </div>
-      <button
-        class="absolute top-[30vw] right-[46vw] bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full"
-      >
+      <div class="absolute top-[40vw] right-[46vw]">
+        <button
+        class="bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full"
+        >
         Join a game
-      </button>
+        </button>
+      </div>
+      
 
       <div class="glass absolute top-20 left-0 w-[30vw] h-[40vw]">
         <h2 class="absolute top-0 left-[7vw] text-2xl font-bold underline">Private Match</h2>
