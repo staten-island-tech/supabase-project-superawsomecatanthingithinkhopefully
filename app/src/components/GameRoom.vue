@@ -6,6 +6,7 @@
 
 <script setup lang="ts">
 import { supabase } from '@/lib/supabaseClient'
+import { ref, reactive } from 'vue'
 
 async function f() {
   //get userid before
