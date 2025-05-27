@@ -14,7 +14,7 @@
             <label for="email" class="block text-sm/6 font-medium text-white">Email address</label>
             <div class="mt-2">
               <input
-                v-model="signupStore.email"
+                v-model="signupStore.user_info.email"
                 type="email"
                 name="email"
                 id="email"
@@ -32,7 +32,7 @@
             </div>
             <div class="mt-2">
               <input
-                v-model="signupStore.password"
+                v-model="signupStore.user_info.password"
                 type="password"
                 name="password"
                 id="password"
@@ -68,13 +68,16 @@ import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabaseClient'
 import { RouterLink } from 'vue-router'
 import { onMounted } from 'vue'
+import { userInfo } from 'os'
 
 const router = useRouter()
 const signupStore = useSignupStore()
 async function handleLog() {
   const result = await signupStore.login()
   if (!result.error) {
+    console.log(signupStore.user_info.username)
     router.push({ path: '/dash' })
+    
   }
 }
 </script>

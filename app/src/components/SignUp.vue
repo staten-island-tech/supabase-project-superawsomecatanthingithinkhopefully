@@ -14,7 +14,7 @@
             <label for="username" class="block text-sm/6 font-medium text-white">Username</label>
             <div class="mt-2">
               <input
-                v-model="signupStore.username"
+                v-model="signupStore.user_info.username"
                 type="text"
                 placeholder="Username"
                 id="username"
@@ -28,7 +28,7 @@
             <label for="email" class="block text-sm/6 font-medium text-white">Email address</label>
             <div class="mt-2">
               <input
-                v-model="signupStore.email"
+                v-model="signupStore.user_info.email"
                 type="email"
                 name="email"
                 id="email"
@@ -46,7 +46,7 @@
             </div>
             <div class="mt-2">
               <input
-                v-model="signupStore.password"
+                v-model="signupStore.user_info.password"
                 type="password"
                 name="password"
                 id="password"
@@ -79,18 +79,21 @@ import { useSignupStore } from '@/stores/authuser'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabaseClient'
 import { onMounted } from 'vue'
+import { type profileType } from '@/types/types'
 const signupStore = useSignupStore()
 const router = useRouter()
 
 async function handleSignup() {
   const result = await signupStore.signup()
 
-  if (result.error) {
-    console.error(result.error)
+  if (!result.data.user) {
+    console.error(signupStore.error)
   } else {
+    console.log(result.data.user.id)
+    console.log(signupStore.user_info.username)
     const { data, error: insertError } = await supabase
       .from('profiles')
-      .insert([{ id: result.data.user?.id, username: signupStore.username }])
+      .upsert([{ id: result.data.user?.id, username: signupStore.user_info.username }])
     router.push({ path: '/dash' })
   }
 }

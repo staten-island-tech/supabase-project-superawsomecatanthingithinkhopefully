@@ -5,7 +5,6 @@ import '../assets/main.css'
 import MainDashboard from '@/components/MainDashboard.vue'
 import GameRoom from '@/components/GameRoom.vue'
 import AccountStuff from '@/views/AccountStuff.vue'
-import TestBoard from '@/views/TestBoard.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,12 +23,12 @@ const router = createRouter({
     {
       path:'/dash',
       name:'dash',
-      component: () => import('@/views/TestBoard.vue'),
+      component:MainDashboard,
     },
     {
       path:'/:gameid',
       name:'game',
-      component: () => import('@/views/StartGame.vue'),
+      component:GameRoom,
     },
     {
       path: '/HomePage',
@@ -39,7 +38,7 @@ const router = createRouter({
     {
       path: '/AccountStuff',
       name: 'AccountStuff',
-      component:AccountStuff
+      component: AccountStuff
     },
   ],
 })

@@ -1,22 +1,26 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { supabase } from '@/lib/supabaseClient'
-
+import { type AuthForm } from '@/types/types'
 export const useSignupStore = defineStore('signup', () => {
-  const username = ref<string>('')
-  const email = ref<string>('')
-  const password = ref<string>('')
+  
+  const user_info = ref<AuthForm>({
+    username : '',
+    email: '',
+    password:''
+  })
+  
   const error = ref<string | null>(null)
   const isLoggedIn = ref(false)
-  const user = ref(null)
+  
 
   async function signup() {
     const result = await supabase.auth.signUp({
-      email: email.value,
-      password: password.value,
+      email: user_info.value.email ,
+      password: user_info.value.password,
       options: {
         data: {
-          username: username.value
+          username: user_info.value.username
         }
       }
     })
@@ -24,15 +28,21 @@ export const useSignupStore = defineStore('signup', () => {
     if (result.error) {
       error.value = result.error.message
     } else {
-      error.value = null
+      // console.log(user_info.username)
+      // const userId = result.data.user
+      // if(userId){
+      //   const {data:profileData,error:profileError} = await supabase.from('profiles').update({username:user_info.username}).eq('id',userId.id).select()
+      // }
+      
     }
+    
 
     return { data: result.data, error: result.error }
   }
   async function login() {
     const result = await supabase.auth.signInWithPassword({
-      email: email.value,
-      password: password.value,
+      email: user_info.value.email,
+      password: user_info.value.password,
       
     })
   
@@ -42,17 +52,14 @@ export const useSignupStore = defineStore('signup', () => {
     } else {
       error.value = null
       isLoggedIn.value=true
-      console.log(" yeah u logged in")
+      console.log(user_info.value.username)
     }
   
     return { data: result.data, error: result.error }
   }
 
   return {
-    username,
-    
-    email,
-    password,
+    user_info,
     error,
     signup,
     login,
