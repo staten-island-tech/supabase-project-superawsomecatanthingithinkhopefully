@@ -1,130 +1,52 @@
 <template>
   <div data-theme="synthwave" class="min-h-screen">
-    
     <button @click="handleDeletion()" v-if="use_rooms.id == use_rooms.user_id">delete room</button>
-    <div class="w-full flex justify-center">
-    <!-- your button layout here --><div class="flex flex-col items-center space-y-1 text-center">
-  <!-- Row 1: 3 -->
-  <div class="w-full flex justify-center">
-  <div class="scale-125">
-    <div class="flex flex-col items-center space-y-1 text-center">
-      <!-- Row 1: 3 -->
-      <div class="flex space-x-15 mt-8 ml-12">
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
+    <div class="w-full flex justify-center relative">
+      <!-- your button layout here -->
+      <div class="flex flex-col items-center space-y-1 text-center">
+        <!-- Row 1: 3 -->
+        <!-- <div class="w-full flex justify-center"> -->
       </div>
-
-      <!-- Row 2: 4 -->
-      <div class="flex space-x-15 mt-1 ml-10">
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-      </div>
-
-      <!-- Row 3: 5 -->
-      <div class="flex space-x-15 mt-1 ml-8">
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-      </div>
-
-      <!-- Row 4: 6 -->
-      <div class="flex space-x-15 mt-1 ml-6">
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-      </div>
-
-      <!-- Row 5: 7 (center) -->
-      <div class="flex space-x-15 mt-1 ml-4">
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-      </div>
-
-      <!-- Row 6: 6 -->
-      <div class="flex space-x-15 mt-1 ml-6">
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-      </div>
-
-      <!-- Row 7: 5 -->
-      <div class="flex space-x-15 mt-1 ml-8">
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-      </div>
-
-      <!-- Row 8: 4 -->
-      <div class="flex space-x-15 mt-1 ml-10">
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-      </div>
-
-      <!-- Row 9: 3 -->
-      <div class="flex space-x-15 mt-1 mb-8 ml-12">
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
-        <button class="w-10 h-10 bg-gray-300"></button>
+      <div
+        class="players flex justify-center absolute right-[5vw] top-[17vw] w-[40vw] h-[27vw] bg-blue-500"
+      >
+        <div class="absolute left-2 top-2 w-[5vw] h-[5vw] bg-red-500">
+          <h1>Username: {{ use_profile.profile.username }}</h1>
+        </div>
       </div>
     </div>
   </div>
-</div>
-</div>
-</div>
-
-
-  </div>
 </template>
 
-
 <script setup lang="ts">
-import { supabase } from '@/lib/supabaseClient';
-import { rooms } from '@/stores/rooms';
-import { isConstructorDeclaration } from 'typescript';
-import { useRoute,useRouter } from 'vue-router';
+import { supabase } from '@/lib/supabaseClient'
+import { rooms } from '@/stores/rooms'
+import { isConstructorDeclaration } from 'typescript'
+import { useRoute, useRouter } from 'vue-router'
+import { profileStore } from '@/stores/profile'
+import UserProfile from '@/components/UserProfile.vue'
+import { type User } from '@supabase/supabase-js'
+import { ref, reactive } from 'vue'
+import { onMounted } from 'vue'
+
 const router = useRoute()
 const routers = useRouter()
 const use_rooms = rooms()
-async function handleDeletion(){
-  
-  
+async function handleDeletion() {
   const route_id = router.params.gameid as string
   console.log(route_id)
   await use_rooms.deleteRoom(route_id)
 
-  
-  routers.push({path:"/dash"})
-
-  
-  
-  
-  
-  
-  
-  
+  routers.push({ path: '/dash' })
 }
+const use_profile = profileStore()
+const auth = ref<User | null>(null)
+onMounted(async () => {
+  const result = await use_profile.fetchUserProfile()
+  auth.value = result.user
+  console.log(result)
+  console.log(auth.value)
+})
 </script>
 
-<style  scoped>
-
-</style>
+<style scoped></style>
