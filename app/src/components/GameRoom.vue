@@ -1,7 +1,25 @@
 <template>
   <div data-theme="synthwave" class="min-h-screen">
+    <div v-if="use_rooms.isCreator != true">
+       <p>3</p>
+       <p>{{ use_rooms.user_id }}</p>
+       <p>{{use_rooms.id}}</p>
+    </div>
+    <div v-else>
+      
+      <p>{{ use_rooms.id }}</p>
+      <p>{{ use_rooms.user_id }}</p>
+      <button @click="handleDeletion()" v-if="use_rooms.id == use_rooms.user_id">delete room</button>
+    </div>
+
+    <h2 v-if="!use_profile.profile">Loading...</h2>
+        <div class="" v-else>
+            <h2 >Username: {{ use_profile.profile.username }}</h2>
+
+        </div>
     
-    <button @click="handleDeletion()" v-if="use_rooms.id == use_rooms.user_id">delete room</button>
+
+    
     <div class="w-full flex justify-center">
     <!-- your button layout here --><div class="flex flex-col items-center space-y-1 text-center">
   <!-- Row 1: 3 -->
@@ -100,11 +118,13 @@
 <script setup lang="ts">
 import { supabase } from '@/lib/supabaseClient';
 import { rooms } from '@/stores/rooms';
-import { isConstructorDeclaration } from 'typescript';
+import { profileStore } from '@/stores/profile';
+import { onMounted } from 'vue';
 import { useRoute,useRouter } from 'vue-router';
 const router = useRoute()
 const routers = useRouter()
 const use_rooms = rooms()
+const use_profile = profileStore()
 async function handleDeletion(){
   
   
@@ -114,15 +134,12 @@ async function handleDeletion(){
 
   
   routers.push({path:"/dash"})
-
-  
-  
-  
-  
-  
-  
-  
 }
+
+onMounted(async()=>{
+    const result = await use_profile.fetchUserProfile()
+    
+})
 </script>
 
 <style  scoped>

@@ -8,7 +8,7 @@ export const rooms = defineStore('rooms', () => {
   const id = ref<string>('')
   const number_player = ref<number>(4)
   const user_id = ref<string>('')
-
+  const isCreator = ref<boolean>(false)
  
   async function makeRoom() {
     const {data:{user}, error:authError} = await supabase.auth.getUser()
@@ -18,8 +18,10 @@ export const rooms = defineStore('rooms', () => {
         return null;
     }
     
-    else{user_id.value = user?.id 
-      console.log(user_id.value)}
+    else{
+      user_id.value = user?.id 
+      console.log(user_id.value)
+    }
     
     const {data,error} = await supabase.from('game').insert([{number_player:number_player.value,user_id:user.id}]).select()
 
@@ -31,6 +33,8 @@ export const rooms = defineStore('rooms', () => {
     else{
         if (data){
             id.value = data[0].id
+            isCreator.value = true
+            console.log(isCreator.value)
             return {id:id.value}
         }
     }
@@ -69,6 +73,7 @@ export const rooms = defineStore('rooms', () => {
     user_id,
     fetchRooms,
     deleteRoom,
+    isCreator
   }
 })
 
