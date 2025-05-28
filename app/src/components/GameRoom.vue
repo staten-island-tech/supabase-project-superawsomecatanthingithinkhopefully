@@ -7,11 +7,15 @@
         <!-- Row 1: 3 -->
         <!-- <div class="w-full flex justify-center"> -->
       </div>
-      <div
-        class="players flex justify-center absolute right-[5vw] top-[17vw] w-[40vw] h-[27vw] bg-blue-500"
-      >
-        <div class="absolute left-2 top-2 w-[5vw] h-[5vw] bg-red-500">
-          <h1>Username: {{ use_profile.profile.username }}</h1>
+      <div class="absolute right-[5vw] top-[17vw] w-[40vw] h-[27vw] bg-blue-500">
+        <div
+          class="flex items-center absolute left-10 top-5 w-[18vw] h-[8vw] bg-blue-300 rounded-full"
+        >
+          <div class="w-[5vw] rounded-full">
+            <img class="rounded-full" src="/profile_temp.jpg" alt="profile_pic" />
+          </div>
+          <h2 v-if="!use_profile.profile">Loading...</h2>
+          <h1 class="text-5xl color-white-500" v-else>{{ use_profile.profile.username }}</h1>
         </div>
       </div>
     </div>
