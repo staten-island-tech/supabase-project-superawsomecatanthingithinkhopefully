@@ -17,4 +17,9 @@ export interface AuthForm {
   email: string
   password: string
 }
-
+export interface Tiles{
+  resource:string
+  quantity?:number
+  number:number|null
+  position?:{x:number,y:number}
+}

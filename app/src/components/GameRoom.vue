@@ -110,7 +110,7 @@
 </div>
 </div>
 
-
+  <button @click = "use_gameLogic.generateTiles()">23</button>
   </div>
 </template>
 
@@ -119,12 +119,14 @@
 import { supabase } from '@/lib/supabaseClient';
 import { rooms } from '@/stores/rooms';
 import { profileStore } from '@/stores/profile';
+import { gameLogic } from '@/stores/logic';
 import { onMounted } from 'vue';
 import { useRoute,useRouter } from 'vue-router';
 const router = useRoute()
 const routers = useRouter()
 const use_rooms = rooms()
 const use_profile = profileStore()
+const use_gameLogic = gameLogic()
 async function handleDeletion(){
   
   
