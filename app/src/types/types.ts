@@ -21,5 +21,5 @@ export interface Tiles{
   resource:string
   quantity?:number
   number:number|null
-  position?:{x:number,y:number}
+  position?:{row:number,column:number}
 }

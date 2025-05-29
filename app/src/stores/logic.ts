@@ -29,15 +29,42 @@ export const gameLogic = defineStore('gameLogic', () => {
   }
 }
     async function generateTiles(){
+        console.log(tilesTotal.value)
         shuffle(avalNumbers)
-        const x = ref<number>(0)
-        const y = ref<number>(0)
-        tilesTotal.value.forEach((tile,index)=>{
-            const randInt = Math.floor(Math.random()*tilesTotal.value.length)
-            x.value+=1
-            y.value+=1
-            individualTiles.value.push({resource:tilesTotal.value[randInt].resource,number:avalNumbers[0],position:{x:x.value,y:y.value}})
-        })
+        const row = ref<number>(0)
+        const column = ref<number>(0)
+        while(tilesTotal.value){
+        console.log(tilesTotal.value)
+        const randInt = Math.floor(Math.random()*tilesTotal.value.length)
+            if (row.value ==1 &&column.value ==3){
+                row.value = 2
+                column.value = 1
+            }
+            else if ((row.value == 2 || row.value == 4)&&column.value == 4){
+                row.value += 1
+                column.value = 1
+            }
+            else if(row.value == 3&&column.value == 5){
+                row.value+=1
+                column.value = 1
+            }
+            
+            
+            row.value+=1
+            column.value+=1
+            individualTiles.value.push({resource:tilesTotal.value[randInt].resource,number:avalNumbers[0],position:{row:row.value,column:column.value}})
+            
+            if (tilesTotal.value[randInt].quantity){
+                tilesTotal.value[randInt].quantity-=1
+            }
+            if (tilesTotal.value[randInt].quantity == 0){
+                tilesTotal.value.splice(randInt,1)
+            }
+        }
+        
+            
+            
+        
         console.log(individualTiles.value)
         
         
