@@ -29,13 +29,15 @@ export const gameLogic = defineStore('gameLogic', () => {
   }
 }
     async function generateTiles(){
-        console.log(tilesTotal.value)
+
         shuffle(avalNumbers)
         const row = ref<number>(0)
         const column = ref<number>(0)
         while(tilesTotal.value){
-        console.log(tilesTotal.value)
+        
         const randInt = Math.floor(Math.random()*tilesTotal.value.length)
+
+        console.log(tilesTotal.value[randInt])
             if (row.value ==1 &&column.value ==3){
                 row.value = 2
                 column.value = 1
