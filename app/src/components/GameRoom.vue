@@ -12,16 +12,17 @@
         <details class="dropdown absolute top-0 left-0">
           <summary class="btn m-1 bg-purple-950">Choose your color</summary>
           <ul class="menu dropdown-content bg-purple-900 rounded-box z-1 w-52 p-2 shadow-sm">
-            <li><a class="bg-red-500">Red</a></li>
-            <li><a>Blue</a></li>
-            <li><a>Green</a></li>
-            <li><a>Yellow</a></li>
-            <li><a>Purple</a></li>
-            <li><a>Black</a></li>
+            <li @click="pickcolor('red')"><a class="bg-red-500">Red</a></li>
+            <li @click="pickcolor('purple')"><a class="bg-blue-500">Blue</a></li>
+            <li><a class="bg-green-500">Green</a></li>
+            <li><a class="bg-yellow-500">Yellow</a></li>
+            <li><a class="bg-purple-500">Purple</a></li>
+            <li><a class="bg-zinc-500">Black</a></li>
           </ul>
         </details>
         <div
-          class="flex items-center absolute left-0 top-[10vw] w-[18vw] h-[8vw] bg-linear-to-bl from-violet-500 to-fuchsia-500 rounded-full"
+          class="flex items-center absolute left-0 top-[10vw] w-[18vw] h-[8vw] rounded-full"
+          :class="ShutupEyad"
         >
           <div class="w-[5vw] rounded-full">
             <img class="rounded-full" src="/profile_temp.jpg" alt="profile_pic" />
@@ -67,6 +68,30 @@ onMounted(async () => {
   console.log(result)
   console.log(auth.value)
 })
+
+let purple = ref<boolean>(true)
+let currentcolor = ref(purple)
+let red = ref<boolean>(false)
+
+const ShutupEyad = reactive({
+  active: true,
+  'text-danger': true,
+  'bg-linear-to-bl from-violet-500 to-fuchsia-500': purple,
+  'bg-linear-to-bl from-red-600 to-red-900': red,
+})
+
+function pickcolor(color: string) {
+  if (color === 'red') {
+    currentcolor.value = false
+    red.value = true
+    currentcolor = red
+  }
+  if (color === 'purple') {
+    currentcolor.value = false
+    purple.value = true
+    currentcolor = purple
+  }
+}
 </script>
 
 <style scoped></style>
