@@ -29,15 +29,16 @@ export const gameLogic = defineStore('gameLogic', () => {
   }
 }
     async function generateTiles(){
-
+        console.log(individualTiles.value)
         shuffle(avalNumbers)
         const row = ref<number>(0)
         const column = ref<number>(0)
         while(tilesTotal.value){
         
         const randInt = Math.floor(Math.random()*tilesTotal.value.length)
-
-        console.log(tilesTotal.value[randInt])
+            row.value+=1
+            column.value+=1
+            
             if (row.value ==1 &&column.value ==3){
                 row.value = 2
                 column.value = 1
@@ -52,22 +53,27 @@ export const gameLogic = defineStore('gameLogic', () => {
             }
             
             
-            row.value+=1
-            column.value+=1
-            individualTiles.value.push({resource:tilesTotal.value[randInt].resource,number:avalNumbers[0],position:{row:row.value,column:column.value}})
             
+            individualTiles.value.push({resource:tilesTotal.value[randInt].resource,number:avalNumbers[0],position:{row:row.value,column:column.value}})
+            // if (individualTiles.value[randInt].resource==undefined){
+            //     console.log("jordan is gay")
+            // }
+            console.log(1)
+            console.log(individualTiles.value)
+            console.log(individualTiles.value[randInt].position?.row)
             if (tilesTotal.value[randInt].quantity){
                 tilesTotal.value[randInt].quantity-=1
             }
             if (tilesTotal.value[randInt].quantity == 0){
                 tilesTotal.value.splice(randInt,1)
             }
+
         }
         
             
             
         
-        console.log(individualTiles.value)
+        
         
         
         
