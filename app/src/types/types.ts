@@ -17,4 +17,8 @@ export interface AuthForm {
   email: string
   password: string
 }
+export interface Datatype {
+  user_id: string,
+  id: string,
+}
 
