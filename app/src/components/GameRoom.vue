@@ -10,7 +10,7 @@
       
       <div class="absolute right-[5vw] top[3vw] w-[40vw] h-[15vw] glass">
         <h1 class="underline text-center font-bold">Room Settings</h1>
-        <h2>Room Link: </h2>
+        
       </div>
 
       <div class="absolute right-[5vw] top-[17vw] w-[40vw] h-[27vw]">
@@ -54,7 +54,7 @@ import { isConstructorDeclaration } from 'typescript'
 import { useRoute, useRouter } from 'vue-router'
 import { profileStore } from '@/stores/profile'
 import UserProfile from '@/components/UserProfile.vue'
-import { type User } from '@supabase/supabase-js'
+import { PostgrestError, type User } from '@supabase/supabase-js'
 import { ref, reactive } from 'vue'
 import { onMounted } from 'vue'
 import { stringify } from 'querystring'
@@ -80,28 +80,32 @@ onMounted(async () => {
   console.log(result)
   console.log(auth.value)
 
-  let room_link = ref<string>('')
-  const user_id = ref<string>('')
   
 
-  const {data:{user}, error:authError} = await supabase.auth.getUser()
+
+
+  // let room_link = ref<string>('')
+  // const user_id = ref<string>('')
+  
+
+  // const {data:{user}, error:authError} = await supabase.auth.getUser()
     
-  if (authError||!user){
-    // console.log(authError,user)
-    return null;
-  }
+  // if (authError||!user){
+  //   // console.log(authError,user)
+  //   return null;
+  // }
     
-  else{user_id.value = user?.id 
-    console.log("user id",user_id.value)}
+  // else{user_id.value = user?.id 
+  //   console.log("user id",user_id.value)}
 
   
-  const {data, error}:{data:Datatype, error:any} = await supabase.from('game').select('user_id, id').eq('user_id',user_id.value)
+  // const {data, error}:{data:Datatype[]|null, error:PostgrestError|null} = await supabase.from('game').select('user_id, id').eq('user_id',user_id.value)
   
-  if(data){
-    console.log("da data", data[0])
-    room_link.value = data.id
-    console.log(room_link.value)
-  }
+  // if(data){
+  //   console.log("da data", data[0])
+  //   room_link.value = data[0].id
+  //   console.log(room_link.value)
+  // }
   
   
   
