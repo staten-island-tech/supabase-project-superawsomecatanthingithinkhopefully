@@ -1,16 +1,9 @@
 <template>
   <div data-theme="synthwave" class="min-h-screen">
-    <div v-if="use_rooms.isCreator != true">
-       <p>3</p>
-       <p>{{ use_rooms.user_id }}</p>
-       <p>{{use_rooms.id}}</p>
-    </div>
-    <div v-else>
-      
-      <p>{{ use_rooms.id }}</p>
-      <p>{{ use_rooms.user_id }}</p>
+    
+    
       <button @click="handleDeletion()" v-if="use_rooms.id == use_rooms.user_id">delete room</button>
-    </div>
+
 
     <h2 v-if="!use_profile.profile">Loading...</h2>
         <div class="" v-else>
@@ -68,9 +61,9 @@ const use_gameLogic = gameLogic()
 async function handleDeletion(){
   
   
-  const route_id = router.params.gameid as string
-  console.log(route_id)
-  await use_rooms.deleteRoom(route_id)
+  
+  
+  await use_rooms.deleteRoom(use_gameLogic.route_id)
 
   
   routers.push({path:"/dash"})
