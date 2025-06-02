@@ -40,9 +40,8 @@
       </div>
       <div v-for="data in fetched_data">
         
-          <button @click="joinRoom(data.id)" class="absolute  bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game. </button>
+          <button @click="use_rooms.joinRoom(data.id)" class="absolute  bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game. </button>
       </div>
-      <img src="https://fontmeme.com/temporary/a437f734f00adfc6fefd9eefb8caddbb.png" alt="">
 
       <div class="glass absolute bottom-20 left 0 w-100 h-125">
         <h2 class="absolute bottom-110 left-30 text-2xl font-bold underline">Create Room</h2>
@@ -96,12 +95,7 @@ onMounted(async ()=>{
   fetched_data.value = room_data
   data.value = user_info 
 })
-async function joinRoom(id:string){
 
-  
-  router.push({path:`/${id}`})
-  
-}
 
 </script>
 

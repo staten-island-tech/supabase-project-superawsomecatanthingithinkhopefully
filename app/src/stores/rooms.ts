@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabaseClient'
-
+import { useRouter } from 'vue-router'
+import { profileStore } from './profile'
 
 
 export const rooms = defineStore('rooms', () => {
+  const router = useRouter()
   const id = ref<string>('')
   const number_player = ref<number>(4)
   const user_id = ref<string>('')
@@ -57,6 +59,16 @@ export const rooms = defineStore('rooms', () => {
     
 
   }
+  async function joinRoom(id:string){
+  
+    
+    router.push({path:`/${id}`})
+    const {data:userData,error:userError} = await supabase.auth.getUser()
+    const {data,error} = await supabase.from('game_players').insert({game_id:id,player_id_game:userData.user?.id}).select()
+    console.log(data)
+    console.log(error)
+    
+  }
   async function autoDelete(){
     
   }
@@ -73,7 +85,8 @@ export const rooms = defineStore('rooms', () => {
     user_id,
     fetchRooms,
     deleteRoom,
-    isCreator
+    isCreator,
+    joinRoom
   }
 })
 
