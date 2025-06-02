@@ -1,4 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useSignupStore } from '@/stores/authuser'
+import { supabase } from '@/lib/supabaseClient'
+
 import HomeView from '../views/HomeView.vue'
 import SignUp from '../components/SignUp.vue'
 import '../assets/main.css'
@@ -24,6 +27,10 @@ const router = createRouter({
       path:'/dash',
       name:'dash',
       component:MainDashboard,
+      beforeEnter: (to, from, next) =>{
+        
+        
+      }
     },
     {
       path:'/:gameid',

@@ -98,6 +98,7 @@ onMounted(async ()=>{
   console.log(fetched_data.value)
   data.value = user_info 
   
+  
 })
 async function joinRoom(id:string){
 

@@ -76,6 +76,7 @@ async function handleLog() {
   const result = await signupStore.login()
   if (!result.error) {
     console.log(signupStore.user_info.username)
+    console.log(signupStore.isLoggedIn)
     router.push({ path: '/dash' })
     
   }
