@@ -7,10 +7,9 @@
         <!-- Row 1: 3 -->
         <!-- <div class="w-full flex justify-center"> -->
       </div>
-      
+
       <div class="absolute right-[5vw] top[3vw] w-[40vw] h-[15vw] glass">
         <h1 class="underline text-center font-bold">Room Settings</h1>
-        
       </div>
 
       <div class="absolute right-[5vw] top-[17vw] w-[40vw] h-[27vw]">
@@ -80,40 +79,26 @@ onMounted(async () => {
   console.log(result)
   console.log(auth.value)
 
-  
-
-
-
   // let room_link = ref<string>('')
   // const user_id = ref<string>('')
-  
 
   // const {data:{user}, error:authError} = await supabase.auth.getUser()
-    
+
   // if (authError||!user){
   //   // console.log(authError,user)
   //   return null;
   // }
-    
-  // else{user_id.value = user?.id 
+
+  // else{user_id.value = user?.id
   //   console.log("user id",user_id.value)}
 
-  
   // const {data, error}:{data:Datatype[]|null, error:PostgrestError|null} = await supabase.from('game').select('user_id, id').eq('user_id',user_id.value)
-  
+
   // if(data){
   //   console.log("da data", data[0])
   //   room_link.value = data[0].id
   //   console.log(room_link.value)
   // }
-  
-  
-  
-  
-  
-
-    
-      
 })
 
 let purple = ref<boolean>(true)
@@ -161,7 +146,7 @@ function pickcolor(color: string) {
     yellow.value = true
     currentcolor = yellow
   }
-  if (color === 'black'){
+  if (color === 'black') {
     currentcolor.value = false
     black.value = true
     currentcolor = black
