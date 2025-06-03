@@ -49,7 +49,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import { rooms } from '@/stores/rooms';
 import { profileStore } from '@/stores/profile';
-import { gameLogic } from '@/stores/logic';
+import { gameLogic } from '@/stores/setup';
 import { onMounted } from 'vue';
 import { onBeforeRouteUpdate, useRoute,useRouter } from 'vue-router';
 const router = useRoute()
@@ -72,7 +72,7 @@ async function handleDeletion(){
 onMounted(async()=>{
   
   const tiles = await use_gameLogic.updateRoute()
-  console.log(use_gameLogic.individualTiles)
+  
   const result = await use_profile.fetchUserProfile()
     
 })

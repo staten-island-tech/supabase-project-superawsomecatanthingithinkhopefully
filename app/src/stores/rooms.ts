@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabaseClient'
-import { useRouter } from 'vue-router'
+import { useRouter,useRoute } from 'vue-router'
 import { profileStore } from './profile'
-
+import { gameLogic } from './setup'
 
 export const rooms = defineStore('rooms', () => {
   const router = useRouter()
+  const route = useRoute()
   const id = ref<string>('')
   const number_player = ref<number>(4)
   const user_id = ref<string>('')
@@ -26,7 +27,7 @@ export const rooms = defineStore('rooms', () => {
     }
     
     const {data,error} = await supabase.from('game').insert([{number_player:number_player.value,user_id:user.id}]).select()
-
+    
     if (error&&!data){
   
         // console.log(data,error)
@@ -37,6 +38,9 @@ export const rooms = defineStore('rooms', () => {
             id.value = data[0].id
             isCreator.value = true
             console.log(isCreator.value)
+            await joinRoom(id.value,false)
+            gameLogic().route_id = id.value
+            await gameLogic().turnOrder()
             return {id:id.value}
         }
     }
@@ -59,14 +63,31 @@ export const rooms = defineStore('rooms', () => {
     console.log(deleted_error)
 
   }
-  async function joinRoom(id:string){
+  async function joinRoom(id:string,push:boolean){
   
+    console.log(1)
     
-    router.push({path:`/${id}`})
     const {data:userData,error:userError} = await supabase.auth.getUser()
-    const {data,error} = await supabase.from('game_players').insert({game_id:id,player_id_game:userData.user?.id}).select()
+    if(userData.user){
+      console.log(2)
+          const {data:lengthPlayers,error:lengthError} = await supabase.from('game_players').select().eq('player_id_game',userData.user.id).eq('game_id',id)
+          console.log(lengthPlayers?.length)
+      if(lengthPlayers&&lengthPlayers.length>0){
+        console.log(3)
+        
+      }
+      else{
+        const {data,error} = await supabase.from('game_players').insert({game_id:id,player_id_game:userData.user?.id}).select()
     console.log(data)
     console.log(error)
+      }
+    }
+    
+    if(push){
+      console.log(4)
+      router.push({path:`/${id}`})
+    }
+    
     
   }
   async function autoDelete(){

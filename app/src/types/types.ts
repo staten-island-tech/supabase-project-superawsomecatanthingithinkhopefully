@@ -23,3 +23,14 @@ export interface Tiles{
   number:number|null
   position?:{row:number,column:number}
 }
+
+export interface Vertices{
+  position:{
+    row:number
+    column:number
+  }
+  vertices:{
+    row:number
+    column:number
+  }[]
+}
