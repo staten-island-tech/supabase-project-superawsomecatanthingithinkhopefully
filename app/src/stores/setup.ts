@@ -50,6 +50,7 @@ export const gameLogic = defineStore('gameLogic', () => {
             }else{
                 column.value+=1
             }
+            console.log("makign column",column.value)
     }
     async function generateTiles(){
         const { data: existingTiles, error: existingTilesError } = await supabase
@@ -63,7 +64,7 @@ export const gameLogic = defineStore('gameLogic', () => {
         
         shuffle(avalNumbers.value)
         const row = ref<number>(1)
-        const column = ref<number>(0)
+        const column = ref<number>(1)
         while(tilesTotal.value.length>0){
         
         const randInt = Math.floor(Math.random()*tilesTotal.value.length)
@@ -80,10 +81,10 @@ export const gameLogic = defineStore('gameLogic', () => {
                 avalNumbers.value.splice(0,1)
             }
             
-            if (individualTiles.value){
-                individualTiles.value.push({resource:tilesTotal.value[randInt].resource,number:assignedNumber,position:{row:row.value,column:column.value}})
+            // if (individualTiles.value){
+            //     individualTiles.value.push({resource:tilesTotal.value[randInt].resource,number:assignedNumber,position:{row:row.value,column:column.value}})
 
-            }
+            // }
             
             
             
@@ -99,9 +100,9 @@ export const gameLogic = defineStore('gameLogic', () => {
             }
 
         }
-        const{data,error}:{data:Tiles[]|null,error:PostgrestError|null} = await supabase.from('tiles').select()
+        const{data,error}:{data:Tiles[]|null,error:PostgrestError|null} = await supabase.from('tiles').select().eq('game_id',route_id.value)
         individualTiles.value = data
-    
+        console.log(individualTiles.value)
         getTileVertices(individualTiles)
     }
     
@@ -157,7 +158,8 @@ export const gameLogic = defineStore('gameLogic', () => {
         vertices.value = []
         tiles.value?.forEach((tile)=>{
             if (tile.position&&tile.position.row < 3){
-                console.log(tile.position.column)
+                console.log("ts is the column" ,tile.position.column)
+                
 vertices.value.push({
   position: { row: tile.position.row, column: tile.position.column },
   vertices: [
