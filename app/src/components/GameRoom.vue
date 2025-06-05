@@ -57,17 +57,23 @@ import { PostgrestError, type User } from '@supabase/supabase-js'
 import { ref, reactive } from 'vue'
 import { onMounted } from 'vue'
 import { stringify } from 'querystring'
-import { type Datatype } from '@/types/types'
+import { type Hosttype } from '@/types/types'
+import { gamers } from '@/stores/gamer'
 
 // Eyad made a low taper fade meme reference just nuke his HOS
 
 const router = useRoute()
 const routers = useRouter()
+const gameStore = gamers()
 const use_rooms = rooms()
+const room_id = router.params.gameid as string
+
+
+
 async function handleDeletion() {
-  const route_id = router.params.gameid as string
-  console.log(route_id)
-  await use_rooms.deleteRoom(route_id)
+  
+  console.log(room_id)
+  await use_rooms.deleteRoom(room_id)
 
   routers.push({ path: '/dash' })
 }
@@ -78,6 +84,18 @@ onMounted(async () => {
   auth.value = result.user
   console.log(result)
   console.log(auth.value)
+  
+  const host = await gameStore.get_host()
+  console.log(host.value)
+
+  
+  //console.log(room_host.value)
+  
+  
+  
+  
+
+  // add user id to gplayers id if the user id does not equal host id
 
   // let room_link = ref<string>('')
   // const user_id = ref<string>('')

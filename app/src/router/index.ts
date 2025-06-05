@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useSignupStore } from '@/stores/authuser'
 import { supabase } from '@/lib/supabaseClient'
+import { ref } from 'vue'
 
 
 import HomeView from '../views/HomeView.vue'
@@ -9,7 +10,10 @@ import '../assets/main.css'
 import MainDashboard from '@/components/MainDashboard.vue'
 import GameRoom from '@/components/GameRoom.vue'
 import AccountStuff from '@/views/AccountStuff.vue'
+import { rooms } from '@/stores/rooms'
 
+//const redirect = ref<boolean>(false)
+//const the_rooms = rooms()
 
 
 const router = createRouter({
@@ -30,6 +34,8 @@ const router = createRouter({
       path:'/dash',
       name:'dash',
       component:MainDashboard,
+
+      
       
         
         
@@ -56,7 +62,12 @@ const router = createRouter({
 })
 router.beforeEach((to,from) =>{
   if(!useSignupStore().isLoggedIn && to.name != 'signup' && to.name!='home'){
-    return '/'
+    
+    return ({
+      path: '/',
+      query: {redirect: to.fullPath}
+    })
+    
   } 
   //try to make it so if you copy room link, you must log in then it routes you to room not home page
 })

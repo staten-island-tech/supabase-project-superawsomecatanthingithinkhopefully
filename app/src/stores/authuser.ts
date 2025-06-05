@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 import { supabase } from '@/lib/supabaseClient'
 import { type AuthForm } from '@/types/types'
+
 export const useSignupStore = defineStore('signup', () => {
   
   const user_info = ref<AuthForm>({
