@@ -12,7 +12,6 @@ export const homePage = defineStore('homePage', () => {
             
         const {data,error} = await supabase.from('profiles').select().eq('id',userid.user.id) 
 
-          console.log(data)  
         if (data){
             return data[0]
         }

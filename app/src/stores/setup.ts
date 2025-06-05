@@ -5,6 +5,8 @@ import { useRoute } from 'vue-router'
 import { supabase } from '@/lib/supabaseClient'
 import { type Tiles,type Vertices } from '@/types/types'
 import type { PostgrestError } from '@supabase/supabase-js'
+import { vertexData } from '@/vertex'
+
 export const gameLogic = defineStore('gameLogic', () => {
     const use_rooms = rooms()
     const router = useRoute()
@@ -50,7 +52,6 @@ export const gameLogic = defineStore('gameLogic', () => {
             }else{
                 column.value+=1
             }
-            console.log("makign column",column.value)
     }
     async function generateTiles(){
         const { data: existingTiles, error: existingTilesError } = await supabase
@@ -64,7 +65,7 @@ export const gameLogic = defineStore('gameLogic', () => {
         
         shuffle(avalNumbers.value)
         const row = ref<number>(1)
-        const column = ref<number>(1)
+        const column = ref<number>(0)
         while(tilesTotal.value.length>0){
         
         const randInt = Math.floor(Math.random()*tilesTotal.value.length)
@@ -102,8 +103,6 @@ export const gameLogic = defineStore('gameLogic', () => {
         }
         const{data,error}:{data:Tiles[]|null,error:PostgrestError|null} = await supabase.from('tiles').select().eq('game_id',route_id.value)
         individualTiles.value = data
-        console.log(individualTiles.value)
-        getTileVertices(individualTiles)
     }
     
     async function turnOrder(){
@@ -111,30 +110,32 @@ export const gameLogic = defineStore('gameLogic', () => {
     .from('game_players')
     .select()
     .eq('game_id', route_id.value);
-    
     let id = 0
 
     if(selectData){
         for(let i = 0;i<selectData?.length;i++){
-            const player = selectData[i]
+            let player = selectData[i]
 
-        player.turn_order+=1
+        player.turn_order+=1+i
+
         const { data: insertOrder, error: errorOrder } = await supabase
-    .from('game_players')
-    .update({turn_order:player.turn_order})
-    .eq('player_id_game', player.user_id).select();}}}
+        .from('game_players')
+        .update({turn_order:player.turn_order})
+        .eq('player_id_game', player.player_id_game).select();
+    console.log(errorOrder)}
+    }}
+        
+    
    
     
     
     
     
     async function updateRoute(){
-        const isRoute = ref(false)
+        
         route_id.value = router.params.gameid as string
-        if (route_id.value == router.params.gameid as string ){
-            isRoute.value = true
-        }
-        if (isRoute.value){
+        
+        
  avalNumbers.value = [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12]
 
         tilesTotal.value = [
@@ -148,41 +149,39 @@ export const gameLogic = defineStore('gameLogic', () => {
     ]
         individualTiles.value = []
         await generateTiles()
-        await turnOrder()
+        
+        await vertexConnection()
         }
-       
-    }
-    const vertices = ref<Vertices[]>([])
-    function getTileVertices(tiles:Ref<Tiles[]|null>){
-        const colOffset = ref<number>(0)
-        vertices.value = []
-        tiles.value?.forEach((tile)=>{
-            if (tile.position&&tile.position.row < 3){
-                console.log("ts is the column" ,tile.position.column)
-                
-vertices.value.push({
-  position: { row: tile.position.row, column: tile.position.column },
-  vertices: [
-    { row: tile.position.row, column: tile.position.column +colOffset.value},
-    { row: tile.position.row, column: tile.position.column + 1 +colOffset.value},
-    { row: tile.position.row, column: tile.position.column + 2 + colOffset.value},
-    { row: tile.position.row + 1, column: tile.position.column+1 +colOffset.value},
-    { row: tile.position.row + 1, column: tile.position.column + 2+colOffset.value },
-    { row: tile.position.row + 1, column: tile.position.column + 3 +colOffset.value}
-  ]
-  
-})
-colOffset.value+=2
+    async function vertexConnection(){
+        
+            for (let i = 0; i < vertexData.length; i++) {
+  const { data, error } = await supabase
+    .from('tiles')
+    .update({ vertex: vertexData[i].vertices })
+    .eq('position->>row', String(vertexData[i].position.row))
+    .eq('position->>column', String(vertexData[i].position.column))
+    .eq('game_id',route_id.value)
+    
 
-            }
-        })
-        console.log(vertices.value)
-    }
+  if (error) {
+    console.error(`Error updating tile at index ${i}:`, error);
+  }
+  
+}}
+    
+
+    
+       
+    
+    
+                
+                
+
     return {
         updateRoute,
         individualTiles,
         route_id,
-        turnOrder
+        turnOrder,
         
     }
   })

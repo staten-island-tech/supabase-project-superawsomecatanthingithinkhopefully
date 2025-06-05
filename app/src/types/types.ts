@@ -22,6 +22,8 @@ export interface Tiles{
   quantity?:number
   number:number|null
   position?:{row:number,column:number}
+  settlements?:string[]
+  vertex?:{row:number,column:number}[]
 }
 
 export interface Vertices{
@@ -33,4 +35,17 @@ export interface Vertices{
     row:number
     column:number
   }[]
+}
+
+export interface roomPlayers{
+  game_id:string,
+  player_id_game:string,
+  turn_order:number,
+  vp:number,
+  wood:number,
+  brick:number,
+  sheep:number,
+  ore:number,
+  wheat:number,
+
 }

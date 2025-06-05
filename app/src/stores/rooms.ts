@@ -23,7 +23,6 @@ export const rooms = defineStore('rooms', () => {
     
     else{
       user_id.value = user?.id 
-      console.log(user_id.value)
     }
     
     const {data,error} = await supabase.from('game').insert([{number_player:number_player.value,user_id:user.id}]).select()
@@ -37,10 +36,9 @@ export const rooms = defineStore('rooms', () => {
         if (data){
             id.value = data[0].id
             isCreator.value = true
-            console.log(isCreator.value)
             await joinRoom(id.value,false)
             gameLogic().route_id = id.value
-            await gameLogic().turnOrder()
+            
             return {id:id.value}
         }
     }
@@ -60,31 +58,30 @@ export const rooms = defineStore('rooms', () => {
   async function deleteRoom(id:string){
    
     const {data:deleted_room,error:deleted_error} = await supabase.from('game').delete().eq('id',id)
-    console.log(deleted_error)
 
   }
   async function joinRoom(id:string,push:boolean){
   
-    console.log(1)
     
     const {data:userData,error:userError} = await supabase.auth.getUser()
     if(userData.user){
-      console.log(2)
           const {data:lengthPlayers,error:lengthError} = await supabase.from('game_players').select().eq('player_id_game',userData.user.id).eq('game_id',id)
-          console.log(lengthPlayers?.length)
       if(lengthPlayers&&lengthPlayers.length>0){
-        console.log(3)
         
       }
       else{
-        const {data,error} = await supabase.from('game_players').insert({game_id:id,player_id_game:userData.user?.id}).select()
-    console.log(data)
-    console.log(error)
+        const { data, error } = await supabase
+  .from('game_players')
+  .insert({
+    game_id: id,
+    player_id_game: userData.user?.id,
+  })
+  .select()
       }
     }
     
     if(push){
-      console.log(4)
+      
       router.push({path:`/${id}`})
     }
     

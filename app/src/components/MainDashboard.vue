@@ -85,7 +85,7 @@ const use_user = homePage()
 const router = useRouter()
 async function handleRoom() {
   const result = await use_rooms.makeRoom()
-  console.log(use_rooms.number_player)
+  
   if (result) {
     router.push({ path: `/${result['id']}` })
   }
