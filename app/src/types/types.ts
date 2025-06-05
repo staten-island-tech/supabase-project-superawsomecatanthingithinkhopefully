@@ -21,4 +21,8 @@ export interface Hosttype {
   user_id: string,
   id: string,
 }
+export interface Name_TagType{
+  username: string,
+  id: string
+}
 

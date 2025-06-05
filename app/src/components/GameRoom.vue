@@ -36,9 +36,9 @@
           <div class="w-[5vw] rounded-full">
             <img class="rounded-full" src="/profile_temp.jpg" alt="profile_pic" />
           </div>
-          <h2 v-if="!use_profile.profile">Loading...</h2>
+          <h2 v-if="!gameStore.room_host">Loading...</h2>
           <h1 class="truncate text-3xl color-white-500" v-else>
-            {{ use_profile.profile.username }}
+            {{ host_username }}
           </h1>
         </div>
       </div>
@@ -68,7 +68,7 @@ const gameStore = gamers()
 const use_rooms = rooms()
 const room_id = router.params.gameid as string
 
-
+const host_username = ref()
 
 async function handleDeletion() {
   
@@ -86,7 +86,8 @@ onMounted(async () => {
   console.log(auth.value)
   
   const host = await gameStore.get_host()
-  console.log(host.value)
+  console.log(host?.value)
+  host_username.value = host
 
   
   //console.log(room_host.value)
