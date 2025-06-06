@@ -15,7 +15,6 @@ export const gameLoop = defineStore('gameLoop', () => {
   async function addSettelement(position: { row: number; column: number }) {
   const game_id = gameLogic().route_id
   const userId = use_profile.profile?.id
-  console.log(userId)
   if (!userId) return
 
   const { data: tiles, error: tileError } = await supabase
@@ -23,7 +22,6 @@ export const gameLoop = defineStore('gameLoop', () => {
     .select()
     .filter('vertex', 'cs', `[{"row": ${position.row}, "column": ${position.column}}]`)
     .eq('game_id', game_id)
-    console.log(tileError)
   if (tileError || !tiles || tiles.length === 0) return
  const { data: existingSettlements, error: settlementsError } = await supabase
     .from('tiles')
@@ -77,7 +75,6 @@ export const gameLoop = defineStore('gameLoop', () => {
 });
 
   allPlayers.value = (await getPlayers()) || []
-  console.log(allPlayers.value)
   await determineTurn(currentTurnNumber)
   await resourceDistribution(game_id)
   await subscriptions(gameLogic().route_id)
@@ -85,8 +82,7 @@ export const gameLoop = defineStore('gameLoop', () => {
 }
 
     function checkSettled(establishedRow:number,establishedColumn:number,newRow:number,newColumn:number){
-        console.log("this is the establisehed row",establishedRow)
-        console.log('this is the estbalihed column',establishedColumn)
+        
         newRow-=establishedRow
         newColumn-=establishedColumn
         
@@ -97,8 +93,7 @@ export const gameLoop = defineStore('gameLoop', () => {
     }
     async function getPlayers():Promise<roomPlayers[]|null>{
         const {data:gamePlayers,error:gameError} = await supabase.from('game_players').select().eq('game_id',gameLogic().route_id)
-        console.log(gamePlayers)
-        console.log(gameError)
+        
         return gamePlayers
     }
     async function determineTurn(turnNumber:Ref<number>){
@@ -119,26 +114,17 @@ export const gameLoop = defineStore('gameLoop', () => {
 for (const tile of validSet){
     if(tile.settlements){
         for(const player of tile.settlements){
-                const { data: playerData,error:gameerror } = await supabase
-  .from('game_players')
-  .select()
-  .eq('player_id_game', player)
-  .eq('game_id', gameLogic().route_id)
-  
-        const resource:string = tile.resource
-     
+                const {data,error} = await supabase.rpc('increment', {
+  table_name: 'game_players',
+  key_field: 'player_id_game',
+  row_id: profileStore().profile?.id,
+  game_id: gameLogic().route_id,
+  game_id_field: 'game_id',
+  x: 1,
+  field_name: tile.resource})
+  console.log(error)
 
-     if (playerData && resource ) {
-  currentAmount.value = playerData[0][resource as keyof typeof playerData[0]]||0;
-        currentAmount.value+=1
-        
-}
 
-const { data,error } = await supabase
-  .from('game_players')
-  .update({ [tile.resource]: currentAmount.value })
-  .eq('player_id_game', player)
-  .eq('game_id', game_id);
   
             }}
             
@@ -159,7 +145,6 @@ const { data,error } = await supabase
     (payload)=>console.log(payload)
   )
   .subscribe()
-  console.log(game_id)
     }
 
     

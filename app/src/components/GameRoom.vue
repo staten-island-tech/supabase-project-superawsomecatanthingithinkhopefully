@@ -28,6 +28,7 @@
         <div class="hexagon">
           <div class="hex-grid">
             <button
+            
   v-for="(vertex, index) in tile.vertex"
   :key="index"
   class="vertex-btn"
@@ -48,7 +49,11 @@
         </div>
       </div>
     </div>
-    <p>{{ use_profile.gameProfile }}</p>
+    <p>Brick:{{ use_profile.gameProfile?.brick }}</p>
+    <p>Wood:{{ use_profile.gameProfile?.wood }}</p>
+    <p>Wheat:{{ use_profile.gameProfile?.wheat }}</p>
+    <p>Ore:{{ use_profile.gameProfile?.ore }}</p>
+    <p>Sheep:{{ use_profile.gameProfile?.sheep }}</p>
   </div>
 </template>
 

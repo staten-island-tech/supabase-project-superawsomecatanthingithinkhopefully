@@ -101,8 +101,8 @@ export const gameLogic = defineStore('gameLogic', () => {
             }
 
         }
-        const{data,error}:{data:Tiles[]|null,error:PostgrestError|null} = await supabase.from('tiles').select().eq('game_id',route_id.value)
-        individualTiles.value = data
+        // const{data,error}:{data:Tiles[]|null,error:PostgrestError|null} = await supabase.from('tiles').select().eq('game_id',route_id.value)
+        // individualTiles.value = data
     }
     
     async function turnOrder(){
@@ -122,7 +122,7 @@ export const gameLogic = defineStore('gameLogic', () => {
         .from('game_players')
         .update({turn_order:player.turn_order})
         .eq('player_id_game', player.player_id_game).select();
-    console.log(errorOrder)}
+    }
     }}
         
     
@@ -149,8 +149,13 @@ export const gameLogic = defineStore('gameLogic', () => {
     ]
         individualTiles.value = []
         await generateTiles()
-        
         await vertexConnection()
+        const { data, error } = await supabase
+    .from('tiles')
+    .select()
+    .eq('game_id', route_id.value);
+
+  if (data) individualTiles.value = data;
         }
     async function vertexConnection(){
         
@@ -163,9 +168,7 @@ export const gameLogic = defineStore('gameLogic', () => {
     .eq('game_id',route_id.value)
     
 
-  if (error) {
-    console.error(`Error updating tile at index ${i}:`, error);
-  }
+  
   
 }}
     

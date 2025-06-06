@@ -20,7 +20,6 @@ export const profileStore = defineStore('profileStore', () => {
         if(profile.value){
             const {data,error} = await supabase.from('game_players').select().eq('player_id_game',profile.value.id).eq('game_id',gameLogic().route_id).single()
             gameProfile.value = data
-            console.log(gameProfile.value)
         }
     }
 
