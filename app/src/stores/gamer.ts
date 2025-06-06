@@ -22,6 +22,7 @@ export const gamers = defineStore('gameStore', () => {
             if (data){
                 room_host.value = data[0].username
                 console.log(room_host.value)
+                
                 return room_host
             }
             

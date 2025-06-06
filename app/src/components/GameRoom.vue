@@ -89,7 +89,7 @@ onMounted(async () => {
   console.log(host?.value)
   host_username.value = host
 
-  const {data,error} = await supabase.from('game_players').insert({game_id: room_id}).select()
+  const {data,error} = await supabase.from('game_players').insert({vp: room_id}).select()
   console.log(data)
 
   
