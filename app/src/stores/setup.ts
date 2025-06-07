@@ -21,6 +21,7 @@ export const gameLogic = defineStore('gameLogic', () => {
   { resource: 'ore', quantity: 3 ,number:null},
   { resource: 'desert', quantity: 1,number:null },
     ])
+    const turnNumber = ref<number>(0)
     const individualTiles = ref<Tiles[]|null>([])
     let avalNumbers = ref<number[]>([2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12])
     function shuffle(array:number[]) {
@@ -54,14 +55,20 @@ export const gameLogic = defineStore('gameLogic', () => {
             }
     }
     async function generateTiles(){
+        console.log(route_id.value)
         const { data: existingTiles, error: existingTilesError } = await supabase
     .from('tiles')
     .select()
-    .eq('game_id', route_id.value);
+    .eq('game_id', route_id.value)
+     .order('position->>row', { ascending: true })
+  .order('position->>column', { ascending: true })
+    console.log(existingTilesError)
     if(existingTiles && existingTiles.length > 0  ){
         individualTiles.value = existingTiles
+        console.log("HEY THERES ALREADY TEILS BUDDY")
         return
     }
+    console.log("YO BUDDY WHY ARE YOU STILL GOING")
         
         shuffle(avalNumbers.value)
         const row = ref<number>(1)
@@ -110,18 +117,22 @@ export const gameLogic = defineStore('gameLogic', () => {
     .from('game_players')
     .select()
     .eq('game_id', route_id.value);
-    let id = 0
+    
 
     if(selectData){
-        for(let i = 0;i<selectData?.length;i++){
+        for(let i = 1;i<selectData?.length;i++){
             let player = selectData[i]
-
-        player.turn_order+=1+i
-
+            if(player.turn_order==0){
+                player.turn_order+=i
+            }
+        
+        
         const { data: insertOrder, error: errorOrder } = await supabase
         .from('game_players')
         .update({turn_order:player.turn_order})
         .eq('player_id_game', player.player_id_game).select();
+        turnNumber.value+=1
+        console.log(errorOrder)
     }
     }}
         
@@ -131,10 +142,11 @@ export const gameLogic = defineStore('gameLogic', () => {
     
     
     
-    async function updateRoute(){
-        
-        route_id.value = router.params.gameid as string
-        
+    async function updateRoute(game_id:string){
+        console.log(route_id.value)
+        route_id.value = game_id
+        console.log(route_id.value)
+
         
  avalNumbers.value = [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12]
 
@@ -150,12 +162,17 @@ export const gameLogic = defineStore('gameLogic', () => {
         individualTiles.value = []
         await generateTiles()
         await vertexConnection()
-        const { data, error } = await supabase
-    .from('tiles')
-    .select()
-    .eq('game_id', route_id.value);
+        const { data: updatedTiles } = await supabase
+  .from('tiles')
+  .select()
+  .eq('game_id', route_id.value)
+  .order('position->>row', { ascending: true })
+  .order('position->>column', { ascending: true })
 
-  if (data) individualTiles.value = data;
+individualTiles.value = updatedTiles || []
+        
+        
+  console.log(individualTiles.value)
         }
     async function vertexConnection(){
         
@@ -171,6 +188,14 @@ export const gameLogic = defineStore('gameLogic', () => {
   
   
 }}
+    async function calculateTurnSettlement(number_players:number,turnNumber:number){
+        if (turnNumber/number_players>1){
+            return true
+        }
+        else{
+            return false
+        }
+    }
     
 
     

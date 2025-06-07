@@ -1,6 +1,6 @@
-<template>
+<!-- <template>
   <div data-theme="synthwave" class="min-h-screen">
-    <!-- Controls -->
+    
     <div class="p-4 flex gap-4">
       <button @click="use_gameLogic.turnOrder()">123</button>
       <button v-if="use_rooms.id === use_rooms.user_id" @click="handleDeletion()">
@@ -8,13 +8,13 @@
       </button>
     </div>
 
-    <!-- Profile Section -->
+    
     <h2 v-if="!use_profile.profile">Loading...</h2>
     <div v-else class="p-4">
       <h2>Username: {{ use_profile.profile.username }}</h2>
     </div>
 
-    <!-- Game Board -->
+    
     <div class="catan-board">
       <div
         v-for="(tile, i) in use_gameLogic.individualTiles || []"
@@ -54,6 +54,9 @@
     <p>Wheat:{{ use_profile.gameProfile?.wheat }}</p>
     <p>Ore:{{ use_profile.gameProfile?.ore }}</p>
     <p>Sheep:{{ use_profile.gameProfile?.sheep }}</p>
+    <p>Vp:{{ use_profile.gameProfile?.vp }}</p>
+    
+    
   </div>
 </template>
 
@@ -89,7 +92,7 @@ onMounted(async()=>{
   await use_gameLogic.updateRoute()
 
   await use_profile.fetchUserProfile()
-  await use_profile.getGameProfile()
+  await use_profile.getGameProfile(use_gameLogic.route_id)
 
 })
 </script>
@@ -118,7 +121,7 @@ onMounted(async()=>{
   clip-path: polygon(-50% 50%, 50% 100%, 150% 50%, 50% 0);
   background: #3b8686;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-  /* padding: 6px; */
+  
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -134,7 +137,6 @@ onMounted(async()=>{
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  /* gap: 4px; */
   width: 100%;
   height: 100%;
 }
@@ -163,7 +165,7 @@ onMounted(async()=>{
   font-size: 0.9rem;
 }
 
-/* Grid positioning */
+
 .row-1 { grid-row: 1; }
 .row-2 { grid-row: 2; }
 .row-3 { grid-row: 3; }
@@ -183,10 +185,24 @@ onMounted(async()=>{
   display: none;
 }
 
-/* Offsetting to simulate staggered board */
+
 .row-1, .row-5 { margin-left: 100px; }
 .row-2, .row-4 { margin-left: 60px; }
 
 
 </style>
+ -->
 
+ <template>
+  <div>
+ 
+  </div>
+ </template>
+ 
+ <script setup lang="ts">
+ 
+ </script>
+ 
+ <style scoped>
+ 
+ </style>

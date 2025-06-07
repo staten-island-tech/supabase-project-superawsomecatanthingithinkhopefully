@@ -5,6 +5,7 @@ import '../assets/main.css'
 import MainDashboard from '@/components/MainDashboard.vue'
 import GameRoom from '@/components/GameRoom.vue'
 import AccountStuff from '@/views/AccountStuff.vue'
+import GameBoard from '@/views/GameBoard.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,7 +29,7 @@ const router = createRouter({
     {
       path:'/:gameid',
       name:'game',
-      component:GameRoom,
+      component:GameBoard,
     },
     {
       path: '/HomePage',

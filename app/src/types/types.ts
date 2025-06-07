@@ -2,6 +2,7 @@
 export interface RoomInfo {
   id: string;
   number_player: number;
+  turn_number:number
 
 }
 export interface profileType {
@@ -31,7 +32,7 @@ export interface Vertices{
     row:number
     column:number
   }
-  vertices:{
+  vertex:{
     row:number
     column:number
   }[]

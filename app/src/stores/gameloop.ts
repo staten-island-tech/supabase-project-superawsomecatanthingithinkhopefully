@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { gameLogic } from './setup'
 import { profileStore } from './profile'
 import { type Ref } from 'vue'
-import { type roomPlayers,type Tiles } from '@/types/types'
+import { type RoomInfo, type roomPlayers,type Tiles } from '@/types/types'
 import type { PostgrestError, PostgrestSingleResponse } from '@supabase/supabase-js'
 import { rooms } from './rooms'
 export const gameLoop = defineStore('gameLoop', () => {
@@ -15,13 +15,18 @@ export const gameLoop = defineStore('gameLoop', () => {
   async function addSettelement(position: { row: number; column: number }) {
   const game_id = gameLogic().route_id
   const userId = use_profile.profile?.id
+  console.log(use_profile.profile)
+  console.log(userId)
+  console.log("HEY IM TRYING TO ADD A SETTLEMENT HERE")
   if (!userId) return
-
+    console.log("I FOUND YOU BUDDY")
+  console.log(position)
   const { data: tiles, error: tileError } = await supabase
     .from('tiles')
     .select()
     .filter('vertex', 'cs', `[{"row": ${position.row}, "column": ${position.column}}]`)
     .eq('game_id', game_id)
+    console.log(tileError)
   if (tileError || !tiles || tiles.length === 0) return
  const { data: existingSettlements, error: settlementsError } = await supabase
     .from('tiles')
@@ -75,10 +80,10 @@ export const gameLoop = defineStore('gameLoop', () => {
 });
 
   allPlayers.value = (await getPlayers()) || []
-  await determineTurn(currentTurnNumber)
+  await determineTurn(currentTurnNumber,gameLogic().route_id)
   await resourceDistribution(game_id)
   await subscriptions(gameLogic().route_id)
-  await profileStore().getGameProfile()
+  await profileStore().getGameProfile(gameLogic().route_id)
 }
 
     function checkSettled(establishedRow:number,establishedColumn:number,newRow:number,newColumn:number){
@@ -96,13 +101,20 @@ export const gameLoop = defineStore('gameLoop', () => {
         
         return gamePlayers
     }
-    async function determineTurn(turnNumber:Ref<number>){
-        if(turnNumber.value<=allPlayers.value.length){
+    async function determineTurn(turnNumber:Ref<number>,route:string){
+        if(turnNumber.value>=allPlayers.value.length){
             currentTurnPlayer.value = allPlayers.value[turnNumber.value-1].player_id_game            
+        
+            turnNumber.value = 0
+            const {data,error}:{data:RoomInfo|null,error:PostgrestError|null} = await supabase.from('game').select().eq('game_id',route).single()
+            if(data){
+              data.turn_number+=1
+              await supabase.from('game').update({turn_number:data.turn_number}).eq('player_id_game',data.id)
+            }
         }
-        else{
-            turnNumber.value = 1
-        }
+        currentTurnPlayer.value = allPlayers.value[turnNumber.value].player_id_game            
+        turnNumber.value+=1
+
     }
     async function resourceDistribution(game_id:string) {
         const diceRoll =  3

@@ -11,7 +11,7 @@ export const rooms = defineStore('rooms', () => {
   const id = ref<string>('')
   const number_player = ref<number>(4)
   const user_id = ref<string>('')
-  const isCreator = ref<boolean>(false)
+  const isCreator = ref<boolean|null>(null)
  
   async function makeRoom() {
     const {data:{user}, error:authError} = await supabase.auth.getUser()
@@ -58,7 +58,7 @@ export const rooms = defineStore('rooms', () => {
   async function deleteRoom(id:string){
    
     const {data:deleted_room,error:deleted_error} = await supabase.from('game').delete().eq('id',id)
-
+    console.log(deleted_error)
   }
   async function joinRoom(id:string,push:boolean){
   
@@ -84,14 +84,13 @@ export const rooms = defineStore('rooms', () => {
       
       router.push({path:`/${id}`})
     }
-    
-    
-  }
-  async function autoDelete(){
-    
-  }
-  async function leaveUser() {
-    
+    isCreator.value = false
+    }
+  async function fetchRoomCreator(room_id:string,user_id:string|undefined){
+    const {data,error} = await supabase.from('game').select().eq('id',room_id).single()
+    console.log(data.user_id)
+    isCreator.value = data.user_id === user_id
+    return isCreator.value
   }
   
   
@@ -103,7 +102,7 @@ export const rooms = defineStore('rooms', () => {
     user_id,
     fetchRooms,
     deleteRoom,
-    isCreator,
+    fetchRoomCreator,
     joinRoom
   }
 })

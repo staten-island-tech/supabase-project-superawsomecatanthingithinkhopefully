@@ -16,9 +16,9 @@ export const profileStore = defineStore('profileStore', () => {
         }
         return authData
     }
-    async function getGameProfile(){
+    async function getGameProfile(route_id:string){
         if(profile.value){
-            const {data,error} = await supabase.from('game_players').select().eq('player_id_game',profile.value.id).eq('game_id',gameLogic().route_id).single()
+            const {data,error} = await supabase.from('game_players').select().eq('player_id_game',profile.value.id).eq('game_id',route_id).single()
             gameProfile.value = data
         }
     }
