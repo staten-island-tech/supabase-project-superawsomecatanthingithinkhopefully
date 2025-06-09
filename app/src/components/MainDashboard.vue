@@ -35,7 +35,7 @@
       <div class="absolute bottom-80 left-133">
         <img class='h-60 w-60' src="/Logo.png" alt="Temp">
 
-      </div v-for="">
+      </div >
 
       </div>
       <div v-for="data in fetched_data">

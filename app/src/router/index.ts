@@ -3,7 +3,6 @@ import HomeView from '../views/HomeView.vue'
 import SignUp from '../components/SignUp.vue'
 import '../assets/main.css'
 import MainDashboard from '@/components/MainDashboard.vue'
-import GameRoom from '@/components/GameRoom.vue'
 import AccountStuff from '@/views/AccountStuff.vue'
 import GameBoard from '@/views/GameBoard.vue'
 

@@ -3,7 +3,7 @@ import { rooms } from './rooms'
 import { reactive, ref, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '@/lib/supabaseClient'
-import { type Tiles,type Vertices } from '@/types/types'
+import { type Tiles,type Vertices,type RoomInfo, type roomPlayers } from '@/types/types'
 import type { PostgrestError } from '@supabase/supabase-js'
 import { vertexData } from '@/vertex'
 
@@ -13,17 +13,18 @@ export const gameLogic = defineStore('gameLogic', () => {
     const route_id = ref('')
 
     const tilesTotal = ref<Tiles[]>([
-        
-  { resource: 'wood', quantity: 4,number:null },
-  { resource: 'brick', quantity: 3,number:null },
-  { resource: 'sheep', quantity: 4,number:null },
-  { resource: 'wheat', quantity: 4 ,number:null},
-  { resource: 'ore', quantity: 3 ,number:null},
-  { resource: 'desert', quantity: 1,number:null },
-    ])
-    const turnNumber = ref<number>(0)
+  { resource: 'wood', quantity: 6, number: null },
+  { resource: 'brick', quantity: 5, number: null },
+  { resource: 'sheep', quantity: 5, number: null },
+  { resource: 'wheat', quantity: 5, number: null },
+  { resource: 'ore', quantity: 3, number: null },
+  { resource: 'desert', quantity: 1, number: null }
+])
+
+    const current_player = ref<string>('')
     const individualTiles = ref<Tiles[]|null>([])
-    let avalNumbers = ref<number[]>([2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12])
+let avalNumbers = ref<number[]>([2, 3, 3, 4, 4, 5, 5, 6, 6,8, 8, 9, 9, 10, 10, 11, 11, 12,3, 4, 5, 6, 9, 10
+]);
     function shuffle(array:number[]) {
         let currentIndex = array.length;
 
@@ -38,24 +39,8 @@ export const gameLogic = defineStore('gameLogic', () => {
         array[randomIndex], array[currentIndex]];
   }
 }
-    function tileCoordinates(row:Ref<number>,column:Ref<number>){
-        if (row.value ==1 &&column.value ==3){
-                row.value += 1
-                column.value = 1
-            }
-            else if ((row.value == 2 || row.value == 4)&&column.value == 4){
-                row.value += 1
-                column.value = 1
-            }
-            else if(row.value == 3&&column.value == 5){
-                row.value+=1
-                column.value = 1
-            }else{
-                column.value+=1
-            }
-    }
+    
     async function generateTiles(){
-        console.log(route_id.value)
         const { data: existingTiles, error: existingTilesError } = await supabase
     .from('tiles')
     .select()
@@ -65,10 +50,8 @@ export const gameLogic = defineStore('gameLogic', () => {
     console.log(existingTilesError)
     if(existingTiles && existingTiles.length > 0  ){
         individualTiles.value = existingTiles
-        console.log("HEY THERES ALREADY TEILS BUDDY")
         return
     }
-    console.log("YO BUDDY WHY ARE YOU STILL GOING")
         
         shuffle(avalNumbers.value)
         const row = ref<number>(1)
@@ -78,7 +61,13 @@ export const gameLogic = defineStore('gameLogic', () => {
         const randInt = Math.floor(Math.random()*tilesTotal.value.length)
             
             let assignedNumber = avalNumbers.value[0]
-            tileCoordinates(row,column)
+            if(column.value==5){
+                row.value+=1
+                column.value = 1
+            }
+            else{
+                column.value+=1
+            }
             
             
             if(tilesTotal.value && tilesTotal.value[randInt].resource==='desert'){
@@ -111,30 +100,90 @@ export const gameLogic = defineStore('gameLogic', () => {
         // const{data,error}:{data:Tiles[]|null,error:PostgrestError|null} = await supabase.from('tiles').select().eq('game_id',route_id.value)
         // individualTiles.value = data
     }
+    async function determineTurn(route:string){
+          const { data: players, error: fetchError } = await supabase
     
-    async function turnOrder(){
-        const { data: selectData, error: selectError } = await supabase
+          .from('game_players')
+          .select('player_id_game')
+          .eq('game_id', route)
+          console.log(players)
+          if(players){
+            for (let i = 0; i < players.length; i++) {
+        const player = players[i]
+    
+        const { data:updatedda,error: updateError } = await supabase
+          .from('game_players')
+          .update({ turn_order: i })
+          .eq('player_id_game', player.player_id_game)
+          .eq('game_id', route)
+          .select()
+          console.log(updatedda)
+          }
+    const { data: selectData, error: selectError }= await supabase
+    .from('game_players')
+    .select('player_id_game,turn_order')
+    .eq('game_id', route)
+    .order('turn_order',{ascending:true})
+    console.log(selectError)
+    
+    if(selectData && current_player.value===''){
+        current_player.value = selectData[0].player_id_game
+        const {data:updateData,error:updateError}:{data:RoomInfo|null,error:PostgrestError|null} = await supabase.from('game').update({turn_index:0}).eq('id',route).select().single()
+        console.log(updateData)
+    }
+        
+           
+    
+        
+      }
+    
+    
+    
+        }
+    async function turnOrder(route_id:string){
+    const { data: selectData, error: selectError }:{data:roomPlayers[]|null,error:PostgrestError|null} = await supabase
     .from('game_players')
     .select()
-    .eq('game_id', route_id.value);
+    .eq('game_id', route_id)
+    .order('turn_order',{ascending:true})
+    console.log(selectData)
+    console.log(selectError)
+
+    const {data,error}:{data:RoomInfo|null,error:PostgrestError|null} = await supabase.from('game').select().eq('id',route_id).single()
+    console.log(data)
+    console.log(data?.turn_index)
+    // if(selectData && data?.round ==0&& data.turn_index==0){
+    //     current_player.value = selectData[0].player_id_game
+    //     const {data:updateData,error:updateError}:{data:RoomInfo|null,error:PostgrestError|null} = await supabase.from('game').update({turn_index:data?.turn_index,round:data?.round}).eq('id',route_id).single()
+    // }
+    if(selectData && data &&selectData[data.turn_index]){
+        
+            console.log(selectData[data?.turn_index])
+
+        current_player.value = selectData[data.turn_index].player_id_game
+    }
+    else{
+        console.log("spooky")
+    }
+    console.log(data?.number_player)
+    if (data && data?.turn_index +1 >= data?.number_player ){
+        console.log(data.turn_index)
+        console.log("uefwu")
+        data.turn_index = 0
+        data.round += 1
+    }
+  
+    else if(data){
+        data.turn_index+=1
+    }
     
 
-    if(selectData){
-        for(let i = 1;i<selectData?.length;i++){
-            let player = selectData[i]
-            if(player.turn_order==0){
-                player.turn_order+=i
-            }
-        
-        
-        const { data: insertOrder, error: errorOrder } = await supabase
-        .from('game_players')
-        .update({turn_order:player.turn_order})
-        .eq('player_id_game', player.player_id_game).select();
-        turnNumber.value+=1
-        console.log(errorOrder)
+    const {data:updateData,error:updateError}:{data:RoomInfo|null,error:PostgrestError|null} = await supabase.from('game').update({turn_index:data?.turn_index,round:data?.round}).eq('id',route_id).single()
+    
+    
+    
     }
-    }}
+    
         
     
    
@@ -143,22 +192,20 @@ export const gameLogic = defineStore('gameLogic', () => {
     
     
     async function updateRoute(game_id:string){
-        console.log(route_id.value)
         route_id.value = game_id
-        console.log(route_id.value)
 
         
  avalNumbers.value = [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12]
 
-        tilesTotal.value = [
-        
-  { resource: 'wood', quantity: 4,number:null },
-  { resource: 'brick', quantity: 3,number:null },
-  { resource: 'sheep', quantity: 4,number:null },
-  { resource: 'wheat', quantity: 4 ,number:null},
-  { resource: 'ore', quantity: 3 ,number:null},
-  { resource: 'desert', quantity: 1,number:null },
-    ]
+        const tilesTotal = ref<Tiles[]>([
+  { resource: 'wood', quantity: 6, number: null },
+  { resource: 'brick', quantity: 5, number: null },
+  { resource: 'sheep', quantity: 5, number: null },
+  { resource: 'wheat', quantity: 5, number: null },
+  { resource: 'ore', quantity: 3, number: null },
+  { resource: 'desert', quantity: 1, number: null }
+])
+
         individualTiles.value = []
         await generateTiles()
         await vertexConnection()
@@ -170,9 +217,8 @@ export const gameLogic = defineStore('gameLogic', () => {
   .order('position->>column', { ascending: true })
 
 individualTiles.value = updatedTiles || []
+        console.log(individualTiles.value)
         
-        
-  console.log(individualTiles.value)
         }
     async function vertexConnection(){
         
@@ -188,14 +234,7 @@ individualTiles.value = updatedTiles || []
   
   
 }}
-    async function calculateTurnSettlement(number_players:number,turnNumber:number){
-        if (turnNumber/number_players>1){
-            return true
-        }
-        else{
-            return false
-        }
-    }
+    
     
 
     
@@ -210,6 +249,9 @@ individualTiles.value = updatedTiles || []
         individualTiles,
         route_id,
         turnOrder,
+        current_player,
+        determineTurn,
+        shuffle
         
     }
   })
