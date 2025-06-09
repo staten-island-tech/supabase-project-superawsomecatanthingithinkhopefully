@@ -102,7 +102,7 @@ export const gameLoop = defineStore('gameLoop', () => {
       }
     }
   }
-// if(currentPlayer.wood>=1&&currentPlayer.wheat>=1&&currentPlayer.sheep>=1&&currentPlayer.brick>=1){
+if(currentPlayer.wood>=1&&currentPlayer.wheat>=1&&currentPlayer.sheep>=1&&currentPlayer.brick>=1){
   for (const tile of tiles) {
     const updatedSettlements = tile.settlements || []
     updatedSettlements.push({
@@ -117,7 +117,7 @@ export const gameLoop = defineStore('gameLoop', () => {
       .eq('id', tile.id)
   }
   await buySettlement(userId, game_id)
-// }
+}
   
 
   

@@ -87,7 +87,7 @@ let avalNumbers = ref<number[]>([2, 3, 3, 4, 4, 5, 5, 6, 6,8, 8, 9, 9, 10, 10, 1
             
 
             const{data:tileInsert,error:tileInsertError} = await supabase.from('tiles').upsert({game_id:route_id.value,resource:tilesTotal.value[randInt].resource,number:assignedNumber,position:{row:row.value,column:column.value}},{ onConflict: 'id' }).select()
-            
+            console.log(tileInsert)
                         
             if (tilesTotal.value[randInt].quantity){
                 tilesTotal.value[randInt].quantity-=1

@@ -61,8 +61,6 @@ export const rooms = defineStore('rooms', () => {
     console.log(deleted_error)
   }
   async function joinRoom(id:string,push:boolean){
-  
-    
     const {data:userData,error:userError} = await supabase.auth.getUser()
     if(userData.user){
           const {data:lengthPlayers,error:lengthError} = await supabase.from('game_players').select().eq('player_id_game',userData.user.id).eq('game_id',id)
