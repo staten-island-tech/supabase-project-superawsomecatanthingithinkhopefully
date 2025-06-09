@@ -47,6 +47,7 @@ export const rooms = defineStore('rooms', () => {
     }
     
   }
+  
   async function deleteRoom(id:string){
    
     const deleted_room = await supabase.from('game').delete().eq('id',id)
