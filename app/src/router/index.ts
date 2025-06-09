@@ -15,6 +15,7 @@ import { rooms } from '@/stores/rooms'
 //const redirect = ref<boolean>(false)
 //const the_rooms = rooms()
 
+import GameBoard from '@/views/GameBoard.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,8 +45,7 @@ const router = createRouter({
     {
       path:'/:gameid',
       name:'game',
-      component:GameRoom,
-      
+      component:GameBoard,
     },
     {
       path: '/HomePage',

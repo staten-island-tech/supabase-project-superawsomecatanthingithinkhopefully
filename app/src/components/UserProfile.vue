@@ -29,8 +29,6 @@ const auth = ref<User|null>(null)
 onMounted(async()=>{
     const result = await use_profile.fetchUserProfile()
     auth.value = result.user
-    console.log(result)
-    console.log(auth.value)
 })
 </script>
 

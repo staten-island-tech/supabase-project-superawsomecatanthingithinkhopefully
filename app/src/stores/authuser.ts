@@ -49,7 +49,6 @@ export const useSignupStore = defineStore('signup', () => {
   
     if (result.error) {
       error.value = result.error.message
-      console.log("bruh")
     } else {
       error.value = null
       isLoggedIn.value=true

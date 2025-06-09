@@ -59,7 +59,7 @@ import { onMounted } from 'vue'
 import { stringify } from 'querystring'
 import { type Hosttype } from '@/types/types'
 import { gamers } from '@/stores/gamer'
-
+import { gameLogic } from '@/stores/setup'
 // Eyad made a low taper fade meme reference just nuke his HOS
 
 const router = useRoute()
@@ -71,7 +71,6 @@ const room_id = router.params.gameid as string
 const host_username = ref()
 
 async function handleDeletion() {
-  
   console.log(room_id)
   await use_rooms.deleteRoom(room_id)
 
@@ -84,20 +83,15 @@ onMounted(async () => {
   auth.value = result.user
   console.log(result)
   console.log(auth.value)
-  
+
   const host = await gameStore.get_host()
   console.log(host?.value)
   host_username.value = host
 
-  const {data,error} = await supabase.from('game_players').insert({game_id: room_id}).select()
+  const { data, error } = await supabase.from('game_players').insert({ game_id: room_id }).select()
   console.log(data)
 
-  
   //console.log(room_host.value)
-  
-  
-  
-  
 
   // add user id to gplayers id if the user id does not equal host id
 
@@ -174,6 +168,127 @@ function pickcolor(color: string) {
     currentcolor = black
   }
 }
+
+const use_gameLogic = gameLogic()
 </script>
 
-<style scoped></style>
+<style scoped>
+.catan-board {
+  display: grid;
+  grid-template-columns: repeat(7, 120px);
+  grid-template-rows: repeat(5, 104px);
+  justify-content: center;
+  margin: 1.25rem auto;
+  gap: 0;
+}
+
+.hexagon-container {
+  width: 120px;
+  height: 104px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hexagon {
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(-50% 50%, 50% 100%, 150% 50%, 50% 0);
+  background: #3b8686;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.hexagon:hover {
+  transform: scale(1.02);
+}
+
+.hex-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+}
+
+.vertex-btn {
+  background: #f0f0f0;
+  border: 1px solid #333;
+  border-radius: 50%;
+  width: 80%;
+  height: 80%;
+  transition: background 0.2s;
+}
+
+.vertex-btn:hover {
+  background: #ddd;
+}
+
+.center {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  font-weight: bold;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.row-1 {
+  grid-row: 1;
+}
+.row-2 {
+  grid-row: 2;
+}
+.row-3 {
+  grid-row: 3;
+}
+.row-4 {
+  grid-row: 4;
+}
+.row-5 {
+  grid-row: 5;
+}
+
+.col-1 {
+  grid-column: 1;
+}
+.col-2 {
+  grid-column: 2;
+}
+.col-3 {
+  grid-column: 3;
+}
+.col-4 {
+  grid-column: 4;
+}
+.col-5 {
+  grid-column: 5;
+}
+.col-6 {
+  grid-column: 6;
+}
+.col-7 {
+  grid-column: 7;
+}
+
+.row-fallback,
+.col-fallback {
+  display: none;
+}
+
+.row-1,
+.row-5 {
+  margin-left: 100px;
+}
+.row-2,
+.row-4 {
+  margin-left: 60px;
+}
+</style>

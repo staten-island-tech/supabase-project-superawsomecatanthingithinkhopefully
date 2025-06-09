@@ -87,10 +87,7 @@ async function handleSignup() {
   const result = await signupStore.signup()
 
   if (!result.data.user) {
-    console.error(signupStore.error)
   } else {
-    console.log(result.data.user.id)
-    console.log(signupStore.user_info.username)
     const { data, error: insertError } = await supabase
       .from('profiles')
       .upsert([{ id: result.data.user?.id, username: signupStore.user_info.username }])

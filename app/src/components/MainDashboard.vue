@@ -36,14 +36,15 @@
         <img class='h-60 w-60' src="/Logo.png" alt="Temp">
 
       </div v-for="">
-      <button  class="absolute bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game</button>
 
       </div>
       <div v-for="data in fetched_data">
         
-          <button @click="joinRoom(data.id)" class=" absolute bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game. </button>
+          <button @click="use_rooms.joinRoom(data.id,true)" class="absolute  bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game. </button>
       </div>
-
+      <div v-if="fetched_data&&fetched_data.length==0">
+        <p>No Rooms currently. Make one</p>
+      </div>
 
       <div class="glass absolute bottom-20 left 0 w-100 h-125">
         <h2 class="absolute bottom-110 left-30 text-2xl font-bold underline">Create Room</h2>
@@ -64,6 +65,7 @@
       </div>
       
     </div>
+    
 
   
 </template>
@@ -84,7 +86,7 @@ const use_user = homePage()
 const router = useRouter()
 async function handleRoom() {
   const result = await use_rooms.makeRoom()
-  console.log(use_rooms.number_player)
+  
   if (result) {
     router.push({ path: `/${result['id']}` })
   }
@@ -95,18 +97,9 @@ onMounted(async ()=>{
   const user_info = await use_user.fetchUserData()
   const room_data = await use_rooms.fetchRooms()
   fetched_data.value = room_data
-  console.log(fetched_data.value)
   data.value = user_info 
-  
-  
 })
-async function joinRoom(id:string){
 
-  
-  router.push({path:`/${id}`})
-  
-  
-}
 
 </script>
 
