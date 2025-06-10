@@ -24,7 +24,9 @@ export interface Hosttype {
 }
 export interface Name_TagType{
   username: string,
-  id: string}
+  id: string
+}
+
 export interface Tiles{
   resource:string
   quantity?:number

@@ -16,6 +16,7 @@ import { rooms } from '@/stores/rooms'
 //const the_rooms = rooms()
 
 import GameBoard from '@/views/GameBoard.vue'
+import StartGame from '@/views/StartGame.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,7 +46,9 @@ const router = createRouter({
     {
       path:'/:gameid',
       name:'game',
-      component:GameBoard,
+      component: StartGame,
+      //component:GameBoard,
+      //Changed from Eyads code. Make a seperate route to the GameBoard
     },
     {
       path: '/HomePage',

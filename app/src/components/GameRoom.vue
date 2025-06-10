@@ -29,21 +29,33 @@
             <li @click="pickcolor('black')"><a class="bg-zinc-500">Black</a></li>
           </ul>
         </details>
-        <div
-          class="flex items-center absolute left-0 top-[10vw] w-[18vw] h-[8vw] rounded-full"
-          :class="ShutupEyad"
-        >
-          <div class="w-[5vw] rounded-full">
-            <img class="rounded-full" src="/profile_temp.jpg" alt="profile_pic" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 absolute left-0 top-[10vw]">
+          <div v-for="(players, index) in players" players="players"  :key='players.username'>
+            <div 
+            class="flex items-center w-[18vw] h-[8vw] rounded-full"
+            :class="ShutupEyad"
+            >
+              <div class="w-[5vw] rounded-full">
+                <img class="rounded-full" src="/profile_temp.jpg" alt="profile_pic" />
+              </div>
+              <h2 v-if="!gameStore.room_host">Loading...</h2>
+              <h1 class="truncate text-3xl color-white-500" v-else>
+                {{ players.username }}
+                
+              
+              </h1>
+            
+            
+            </div>
+            
           </div>
-          <h2 v-if="!gameStore.room_host">Loading...</h2>
-          <h1 class="truncate text-3xl color-white-500" v-else>
-            {{ host_username }}
-          </h1>
         </div>
+        
+        
       </div>
     </div>
   </div>
+  
 </template>
 
 <script setup lang="ts">
@@ -57,10 +69,13 @@ import { PostgrestError, type User } from '@supabase/supabase-js'
 import { ref, reactive } from 'vue'
 import { onMounted } from 'vue'
 import { stringify } from 'querystring'
-import { type Hosttype } from '@/types/types'
+import { type Hosttype, type Name_TagType } from '@/types/types'
 import { gamers } from '@/stores/gamer'
 import { gameLogic } from '@/stores/setup'
+import LogIn from './LogIn.vue'
 // Eyad made a low taper fade meme reference just nuke his HOS
+const players = ref()
+const player_names = ref()
 
 const router = useRoute()
 const routers = useRouter()
@@ -81,15 +96,43 @@ const auth = ref<User | null>(null)
 onMounted(async () => {
   const result = await use_profile.fetchUserProfile()
   auth.value = result.user
-  console.log(result)
-  console.log(auth.value)
+  console.log(result, 'result')
+  console.log(auth.value, 'auth.value')
+  console.log("id",auth.value?.id)
+  
+  
 
   const host = await gameStore.get_host()
   console.log(host?.value)
   host_username.value = host
 
-  const { data, error } = await supabase.from('game_players').insert({ game_id: room_id }).select()
-  console.log(data)
+  //const { data, error } = await supabase.from('game_players').insert({ game_id: room_id }).select()
+  //console.log(data)
+  
+  const peeps = await use_rooms.joinRoom(room_id, false)
+  const {data, error} = await supabase.from('game_players').select('game_id, player_id_game').eq('game_id', room_id)
+  if (data){
+    players.value = data
+  }
+  
+  console.log(players.value)
+  const player_ids = ref<string[]>([])
+  for(let i=0; i < players.value.length; i ++){
+    player_ids.value.push(players.value[i].player_id_game)
+    console.log(player_ids.value)
+  }
+  const {data:guys} = await supabase.from('profiles').select('username').in('id', player_ids.value)
+  console.log(guys)
+  players.value = guys
+
+
+  // for(let i=0; i <= players.value.length; i ++){
+  //   let {data:guy}: {data: Name_TagType[] | null} = await supabase.from('profiles').select('username, id').eq('id', players.value[i].player_id_game)
+  //   console.log(guy?.[i], i, 'username, I')
+  //   console.log(players.value.length)
+  //   //player_names.value.push({guy})
+  //   //console.log(player_names.value)
+  // }
 
   //console.log(room_host.value)
 
@@ -125,6 +168,7 @@ let green = ref<boolean>(false)
 let yellow = ref<boolean>(false)
 let black = ref<boolean>(false)
 
+//redo all this color logic to fit with supabase
 const ShutupEyad = reactive({
   active: true,
   'text-danger': true,
@@ -136,38 +180,48 @@ const ShutupEyad = reactive({
   'bg-linear-to-bl from-zinc-500 to-zinc-800': black,
 })
 
-function pickcolor(color: string) {
+async function pickcolor(color: string) {
   if (color === 'red') {
     currentcolor.value = false
     red.value = true
     currentcolor = red
+    const {error} = await supabase.from('game_players').update({color: 'red'}).eq('player_id_game', auth.value?.id).eq('game_id', room_id)
+    
   }
   if (color === 'purple') {
     currentcolor.value = false
     purple.value = true
     currentcolor = purple
+    const {error} = await supabase.from('game_players').update({color: 'purple'}).eq('player_id_game', auth.value?.id).eq('game_id', room_id)
   }
   if (color === 'blue') {
     currentcolor.value = false
     blue.value = true
     currentcolor = blue
+    const {error} = await supabase.from('game_players').update({color: 'blue'}).eq('player_id_game', auth.value?.id).eq('game_id', room_id)
   }
   if (color === 'green') {
     currentcolor.value = false
     green.value = true
     currentcolor = green
+    const {error} = await supabase.from('game_players').update({color: 'green'}).eq('player_id_game', auth.value?.id).eq('game_id', room_id)
   }
   if (color === 'yellow') {
     currentcolor.value = false
     yellow.value = true
     currentcolor = yellow
+    const {error} = await supabase.from('game_players').update({color: 'yellow'}).eq('player_id_game', auth.value?.id).eq('game_id', room_id)
   }
   if (color === 'black') {
     currentcolor.value = false
     black.value = true
     currentcolor = black
+    const {error} = await supabase.from('game_players').update({color: 'black'}).eq('player_id_game', auth.value?.id).eq('game_id', room_id)
   }
 }
+
+//to make them different colors make a computed property that takes in the user id 
+// and matches the color in its table with the color value?
 
 const use_gameLogic = gameLogic()
 </script>
