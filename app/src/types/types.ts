@@ -59,3 +59,14 @@ export interface roomPlayers{
   wheat:number,
 
 }
+
+export interface player_card{
+  username: string,
+  color: string,
+}
+
+export interface GamePlayer{
+  game_id: string
+  player_id_game: string
+  color: string | null
+}

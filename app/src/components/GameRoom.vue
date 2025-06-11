@@ -16,24 +16,24 @@
         <details class="dropdown absolute top-0 left-0">
           <summary class="btn m-1 bg-purple-950">Choose your color</summary>
           <ul class="menu dropdown-content bg-purple-900 rounded-box z-1 w-52 p-2 shadow-sm">
-            <li @click="pickcolor('red')"><a class="bg-red-500">Red</a></li>
+            <li @click="availableColors.includes('red') && pickcolor('red')"><a class="bg-red-500" :class="!availableColors.includes('red') ? 'opacity-50 pointer-events-none' : ''">Red</a></li>
 
-            <li @click="pickcolor('blue')"><a class="bg-blue-500">Blue</a></li>
+            <li @click="availableColors.includes('blue') && pickcolor('blue')"><a class="bg-blue-500" :class="!availableColors.includes('blue') ? 'opacity-50 pointer-events-none' : ''" >Blue</a></li>
 
-            <li @click="pickcolor('green')"><a class="bg-green-500">Green</a></li>
+            <li @click="availableColors.includes('green') && pickcolor('green')"><a class="bg-green-500" :class="!availableColors.includes('green') ? 'opacity-50 pointer-events-none' : ''">Green</a></li>
 
-            <li @click="pickcolor('yellow')"><a class="bg-yellow-500">Yellow</a></li>
+            <li @click="availableColors.includes('yellow') && pickcolor('yellow')"><a class="bg-yellow-500" :class="!availableColors.includes('yellow') ? 'opacity-50 pointer-events-none' : ''">Yellow</a></li>
 
-            <li @click="pickcolor('purple')"><a class="bg-purple-500">Purple</a></li>
+            <li @click="availableColors.includes('purple') && pickcolor('purple')"><a class="bg-purple-500" :class="!availableColors.includes('purple') ? 'opacity-50 pointer-events-none' : ''">Purple</a></li>
 
-            <li @click="pickcolor('black')"><a class="bg-zinc-500">Black</a></li>
+            <li @click="availableColors.includes('black') && pickcolor('black')"><a class="bg-zinc-500" :class="!availableColors.includes('black') ? 'opacity-50 pointer-events-none' : ''">Black</a></li>
           </ul>
         </details>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 absolute left-0 top-[10vw]">
-          <div v-for="(players, index) in players"   :key='players.username'>
+          <div v-for="(players, index) in players" players="players"   :key='players.username'>
             <div 
             class="flex items-center w-[18vw] h-[8vw] rounded-full"
-            :class="ShutupEyad"
+            :class="getPlayerColorClass(players.color)"
             >
               <div class="w-[5vw] rounded-full">
                 <img class="rounded-full" src="/profile_temp.jpg" alt="profile_pic" />
@@ -60,6 +60,7 @@
 
 <script setup lang="ts">
 import { supabase } from '@/lib/supabaseClient'
+import { computed } from 'vue'
 import { rooms } from '@/stores/rooms'
 import { isConstructorDeclaration } from 'typescript'
 import { useRoute, useRouter } from 'vue-router'
@@ -69,7 +70,7 @@ import { PostgrestError, type User } from '@supabase/supabase-js'
 import { ref, reactive } from 'vue'
 import { onMounted } from 'vue'
 import { stringify } from 'querystring'
-import { type Hosttype, type Name_TagType } from '@/types/types'
+import { type Hosttype, type Name_TagType, type GamePlayer } from '@/types/types'
 import { gamers } from '@/stores/gamer'
 import { gameLogic } from '@/stores/setup'
 import LogIn from './LogIn.vue'
@@ -124,7 +125,73 @@ onMounted(async () => {
   const {data:guys} = await supabase.from('profiles').select('username').in('id', player_ids.value)
   console.log(guys)
   players.value = guys
+  const { data: rawGamePlayers } = await supabase
+    .from('game_players')
+    .select('game_id, player_id_game, color')
+    .eq('game_id', room_id)
+  const gamePlayers = rawGamePlayers as GamePlayer[]
+  const colors = gamePlayers.map(p => p.color)
+  const ids = data?.map(p => p.player_id_game) || []
+  const { data: usernames } = await supabase
+    .from('profiles')
+    .select('id, username')
+    .in('id', ids)
 
+  // players.value = usernames?.map(user => {
+  //   const match = data?.find(p => p.player_id_game === user.id)
+  //   return {
+  //     username: user.username,
+  //     color: match?.color || 'gray' // default fallback color
+  //   }
+  // })
+  console.log(players.value)
+  const myChannel= supabase.channel('game_players_resource')
+  
+
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'game_players', filter: `game_id=eq.${room_id}` },
+    async (payload) => {
+      console.log('New player joined:', payload)
+
+      
+      const { data: gamePlayers } = await supabase
+        .from('game_players')
+        .select('game_id, player_id_game, color')
+        .eq('game_id', room_id)
+
+      const ids = gamePlayers?.map(p => p.player_id_game) || []
+      const { data: usernames } = await supabase
+        .from('profiles')
+        .select('id, username')
+        .in('id', ids)
+      
+      
+      
+      
+
+      players.value = usernames
+      const { data } = await supabase
+        .from('game_players')
+        .select('player_id_game, color')
+        .eq('game_id', room_id)
+      players.value = usernames?.map(user => {
+        const match = data?.find(p => p.player_id_game === user.id)
+        return {
+          username: user.username,
+          color: match?.color || 'gray' // default fallback color
+        }
+      })
+      }
+  )
+  .subscribe()
+
+
+
+  //Computed that says if color in the table is red, return the css to make it red
+  // put this computed in place of the :class I love eyad
+
+  //make player type that is the username and color
 
   // for(let i=0; i <= players.value.length; i ++){
   //   let {data:guy}: {data: Name_TagType[] | null} = await supabase.from('profiles').select('username, id').eq('id', players.value[i].player_id_game)
@@ -169,7 +236,7 @@ let yellow = ref<boolean>(false)
 let black = ref<boolean>(false)
 
 //redo all this color logic to fit with supabase
-const ShutupEyad = reactive({
+const I_loveyou_Eyad = reactive({
   active: true,
   'text-danger': true,
   'bg-linear-to-bl from-violet-500 to-fuchsia-500': purple,
@@ -219,6 +286,25 @@ async function pickcolor(color: string) {
     const {error} = await supabase.from('game_players').update({color: 'black'}).eq('player_id_game', auth.value?.id).eq('game_id', room_id)
   }
 }
+
+function getPlayerColorClass(color: string) {
+  switch (color) {
+    case 'red': return 'bg-gradient-to-bl from-red-600 to-red-900'
+    case 'purple': return 'bg-gradient-to-bl from-violet-500 to-fuchsia-500'
+    case 'blue': return 'bg-gradient-to-bl from-sky-600 to-blue-900'
+    case 'green': return 'bg-gradient-to-bl from-green-600 to-green-800'
+    case 'yellow': return 'bg-gradient-to-bl from-amber-300 to-amber-500'
+    case 'black': return 'bg-gradient-to-bl from-zinc-500 to-zinc-800'
+    default: return 'bg-gray-500'
+  }
+}
+const allColors = ['red', 'blue', 'green', 'yellow', 'purple', 'black']
+
+const takenColors = computed(() => players.value.map(p => p.color).filter(Boolean))
+
+const availableColors = computed(() =>
+  allColors.filter(color => !takenColors.value.includes(color))
+)
 
 //to make them different colors make a computed property that takes in the user id 
 // and matches the color in its table with the color value?
