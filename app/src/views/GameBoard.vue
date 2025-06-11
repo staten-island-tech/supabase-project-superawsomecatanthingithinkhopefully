@@ -118,17 +118,17 @@ async function loadInitiatorProfiles(trades: Trade[] | null) {
   if (!trades) return;
 
   for (const trade of trades) {
-    const exists = initiatorProfiles.value.some(p => p.id === trade.init_id);
+const exists = initiatorProfiles.value.find(p => p.id === trade.init_id);
     if (!exists) {
-      const profile = await use_profile.fetchUserById(trade.init_id);
-      if (profile) {
-        initiatorProfiles.value.push(profile);
-      }
-    }
+  const profile = await use_profile.fetchUserById(trade.init_id);
+  if (profile) {
+    initiatorProfiles.value.push(profile);
+  }
+}
   }
 }
 function findProfileById(id: string): profileType | null {
-  return initiatorProfiles.value.find(p => p.id === id) ?? null;
+  return initiatorProfiles.value.find(p => p.id === id) ?? null
 }
 
 
