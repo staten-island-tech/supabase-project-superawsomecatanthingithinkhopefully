@@ -91,7 +91,9 @@ async function handleSignup() {
     const { data, error: insertError } = await supabase
       .from('profiles')
       .upsert([{ id: result.data.user?.id, username: signupStore.user_info.username }])
+    const {error} = await supabase.from('profiles').update({profile_pic: '/Logo.png'}).eq('id', result.data.user?.id)
     router.push({ path: '/dash' })
+
   }
 }
 </script>

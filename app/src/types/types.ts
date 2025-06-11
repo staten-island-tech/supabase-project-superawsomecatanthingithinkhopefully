@@ -20,6 +20,15 @@ export interface AuthForm {
   email: string
   password: string
 }
+export interface Hosttype {
+  user_id: string,
+  id: string,
+}
+export interface Name_TagType{
+  username: string,
+  id: string
+}
+
 export interface Tiles{
   resource:string
   quantity?:number
@@ -75,3 +84,16 @@ export interface Trade {
   recieve_type: string   
   recieve_quant: number  
 }
+
+export interface player_card{
+  username: string,
+  color: string,
+}
+
+export interface GamePlayer{
+  game_id: string
+  player_id_game: string
+  color: string | null
+}
+
+
