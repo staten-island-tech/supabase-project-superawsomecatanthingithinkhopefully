@@ -64,18 +64,24 @@
 
 <script setup lang="ts">
 import { useSignupStore } from '@/stores/authuser'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabaseClient'
 import { RouterLink } from 'vue-router'
 import { onMounted } from 'vue'
 import { userInfo } from 'os'
 
 const router = useRouter()
+const route = useRoute();
+
 const signupStore = useSignupStore()
 async function handleLog() {
   const result = await signupStore.login()
   if (!result.error) {
-    router.push({ path: '/dash' })
+    console.log(signupStore.user_info.username)
+    console.log(signupStore.isLoggedIn)
+    //router.push({ path: '/dash' })
+    const redirectPath = route.query.redirect || '/dash';
+    router.push(redirectPath);
     
   }
 }

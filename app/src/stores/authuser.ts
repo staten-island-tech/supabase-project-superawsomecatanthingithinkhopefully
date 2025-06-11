@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
 import { supabase } from '@/lib/supabaseClient'
 import { type AuthForm } from '@/types/types'
+
 export const useSignupStore = defineStore('signup', () => {
   
   const user_info = ref<AuthForm>({
@@ -11,7 +12,7 @@ export const useSignupStore = defineStore('signup', () => {
   })
   
   const error = ref<string | null>(null)
-  const isLoggedIn = ref(false)
+  const isLoggedIn = ref<boolean>(false)
   
 
   async function signup() {
@@ -51,16 +52,22 @@ export const useSignupStore = defineStore('signup', () => {
     } else {
       error.value = null
       isLoggedIn.value=true
+      
+      console.log(user_info.value.username)
     }
   
-    return { data: result.data, error: result.error }
+    return { data: result.data, error: result.error, isLoggedIn }
   }
+  
+  
 
   return {
     user_info,
     error,
     signup,
     login,
+    
+    isLoggedIn,
   }
 })
 
