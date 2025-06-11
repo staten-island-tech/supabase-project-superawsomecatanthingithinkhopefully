@@ -30,7 +30,7 @@
           </ul>
         </details>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 absolute left-0 top-[10vw]">
-          <div v-for="(players, index) in players" players="players"  :key='players.username'>
+          <div v-for="(players, index) in players"   :key='players.username'>
             <div 
             class="flex items-center w-[18vw] h-[8vw] rounded-full"
             :class="ShutupEyad"
@@ -74,7 +74,7 @@ import { gamers } from '@/stores/gamer'
 import { gameLogic } from '@/stores/setup'
 import LogIn from './LogIn.vue'
 // Eyad made a low taper fade meme reference just nuke his HOS
-const players = ref()
+const players = ref<any>([])
 const player_names = ref()
 
 const router = useRoute()
