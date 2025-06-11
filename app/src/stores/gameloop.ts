@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { gameLogic } from './setup'
 import { profileStore } from './profile'
 import { type Ref } from 'vue'
-import { type RoomInfo, type roomPlayers,type Tiles, type Vertex } from '@/types/types'
+import { type road, type RoomInfo, type roomPlayers,type Tiles, type Vertex } from '@/types/types'
 import type { PostgrestError, PostgrestSingleResponse } from '@supabase/supabase-js'
 import { rooms } from './rooms'
 
@@ -38,9 +38,7 @@ export const gameLoop = defineStore('gameLoop', () => {
     await increment('wheat',-1,userId,gameId)
   }
   async function addSettelement(position: Vertex) {
-    console.log(position)
   const game_id = gameLogic().route_id
-  
   const userId = use_profile.profile?.id
   if (!userId) return
 
@@ -51,84 +49,75 @@ export const gameLoop = defineStore('gameLoop', () => {
     .eq('game_id', game_id)
     .single()
 
-  const { data: tiles } = await supabase
-    .from('tiles')
+  const { data: existingSettlements,error } = await supabase
+    .from('settlements')
     .select()
-    .filter('vertex', 'cs', `[{"row": ${position.row}, "column": ${position.column}}]`)
     .eq('game_id', game_id)
+    console.log(error)
 
-  if (!tiles || tiles.length === 0) return
-
-  const { data: tilesWithSettlements } = await supabase
-    .from('tiles')
+  const { data: playerRoads } = await supabase
+    .from('roads')
     .select()
-    .not('settlements', 'is', null)
     .eq('game_id', game_id)
+    .eq('player_id', userId)
 
-  if (tilesWithSettlements) {
-    console.log(tilesWithSettlements)
-    for (const tileWithSettlements of tilesWithSettlements) {
+  const { data: gameData } = await supabase
+    .from('game')
+    .select()
+    .eq('id', game_id)
+    .single()
 
-      for (const existingSettlement of tileWithSettlements.settlements) {
-        const check = checkSettled(
-          existingSettlement.position.row,
-          existingSettlement.position.column,
-          position.row,
-          position.column,
-          existingSettlement.is_city
-        )
+  for (const settlement of existingSettlements || []) {
+    const check = checkSettled(
+      settlement.row,
+      settlement.column,
+      position.row,
+      position.column,
+      settlement.is_city
+    )
+    if (check === false) return false
+    if (check === 'upgrade' && settlement.player_id === userId) {
+      console.log('hey')
+      if (currentPlayer.wheat >= 2 && currentPlayer.ore >= 3) {
+        await upgradeCity(userId, game_id)
+        await supabase
+          .from('settlements')
+          .update({ is_city: true })
+          .eq('id', settlement.id)
 
-        if (check === false) {
-          return false
-        }
-
-        if (check === 'upgrade') {
-          if(currentPlayer.wheat>=2&&currentPlayer.ore>=3){
-            await upgradeCity(userId, game_id);
-  for (const tile of tiles) {
-    if (!tile.settlements) continue;
-    for (let i = 0; i < tile.settlements.length; i++) {
-      const settlement = tile.settlements[i];
-      tile.settlements[i].is_city = true;
-    }
-
-    await supabase
-      .from('tiles')
-      .update({ settlements: tile.settlements })
-      .eq('id', tile.id);
-  }
-  return;
-          }
-  
-}
+        return
       }
     }
   }
-if(currentPlayer.wood>=1&&currentPlayer.wheat>=1&&currentPlayer.sheep>=1&&currentPlayer.brick>=1){
-  for (const tile of tiles) {
-    const updatedSettlements = tile.settlements || []
-    updatedSettlements.push({
+
+  if (
+    gameData.turn_index >= 2 &&
+    !isVertexConnected(position, playerRoads || [])
+  ) return
+
+  if (
+    currentPlayer.wood >= 1 &&
+    currentPlayer.brick >= 1 &&
+    currentPlayer.wheat >= 1 &&
+    currentPlayer.sheep >= 1
+  ) {
+    const {data,error}=await supabase.from('settlements').insert({
       player_id: userId,
-      position: { row: position.row, column: position.column },
+      game_id: game_id,
+      row: position.row,
+      column: position.column,
       is_city: false
+      
     })
-
-    await supabase
-      .from('tiles')
-      .update({ settlements: updatedSettlements })
-      .eq('id', tile.id)
+    console.log(error)
+    await buySettlement(userId, game_id)
   }
-  await buySettlement(userId, game_id)
-}
-  
 
-  
   allPlayers.value = (await getPlayers()) || []
-  
   await resourceDistribution(game_id)
-  
-  await profileStore().getGameProfile(gameLogic().route_id)
+  await profileStore().getGameProfile(game_id)
 }
+
 
   
     function checkSettled(establishedRow:number,establishedColumn:number,newRow:number,newColumn:number,isCity:boolean){
@@ -149,44 +138,54 @@ if(currentPlayer.wood>=1&&currentPlayer.wheat>=1&&currentPlayer.sheep>=1&&curren
         return gamePlayers
     }
     
-    async function resourceDistribution(game_id:string) {
-        const diceRoll =  7
-        if(diceRoll==7){
-          await loseRandomResources()
-          return
-        }
-        const {data:validSet,error:errorSet}:{data:Tiles[]|null,error:PostgrestError|null}=await supabase.from('tiles').select().eq('number',diceRoll).eq('game_id',gameLogic().route_id).not('settlements', 'eq', '{}')
-        
-    
-        const currentAmount = ref<number>(0)
-        if(validSet ){
-for (const tile of validSet){
-    if(tile.settlements){
-        for(const player of tile.settlements){
-                const {data,error} = await supabase.rpc('increment', {
-  table_name: 'game_players',
-  key_field: 'player_id_game',
-  row_id: profileStore().profile?.id,
-  game_id: gameLogic().route_id,
-  game_id_field: 'game_id',
-  x: 1,
-  field_name: tile.resource})
-  console.log(error)
+    async function resourceDistribution(game_id: string) {
+  const diceRoll = Math.floor(Math.random()*11)+1
+  if (diceRoll === 7) {
+    await loseRandomResources()
+    return
+  }
 
+  const { data: tiles } = await supabase
+    .from('tiles')
+    .select()
+    .eq('number', diceRoll)
+    .eq('game_id', game_id)
 
-  
-            }}
-            
-        }
-        }
-        
-        // const {data,error} = await supabase.from('game_players').update({resources:validSet.resource}).eq('id',validSet.id)
-        const {data:insertingResources,error:insertingError} = await supabase.from('game_players').update({})
+  const { data: settlements,error:errors } = await supabase
+    .from('settlements')
+    .select()
+    .eq('game_id', game_id)
+    console.log(errors)
+
+  for (const tile of tiles || []) {
+    for (const settlement of settlements || []) {
+      const isOnTile =
+        Math.abs(settlement.row - tile.position.row) <= 1 &&
+        Math.abs(settlement.column - tile.position.column) <= 1
+
+      if (!isOnTile) continue
+      const amount = ref<number>(1)
+      if (settlement.is_city){
+        amount.value = 2
+      }
+      
+
+      await supabase.rpc('increment', {
+        table_name: 'game_players',
+        key_field: 'player_id_game',
+        row_id: settlement.player_id,
+        game_id: game_id,
+        game_id_field: 'game_id',
+        x: amount,
+        field_name: tile.resource
+      })
     }
+  }
+}
+
     
 
 async function loseRandomResources() {
-  allRoads()
   type ResourceKey = 'wood' | 'brick' | 'sheep' | 'wheat' | 'ore'
 
   const resourceKeys:ResourceKey[] =  ['wood', 'brick', 'sheep', 'wheat', 'ore']
@@ -213,36 +212,60 @@ const total = resourceKeys.reduce((sum, key) => sum + (player[key] || 0), 0)
   
   
   
-} function allRoads(){
-  let roads =[]
-  let row=0
-  let column = 0
-  while(row<5&&column<5){
-    roads.push({from:{row:row,column:column},to:{row:row+1,column:column}})
-    roads.push({from:{row:row,column:column},to:{row:row,column:column+1}})
-    
-    column+=1
-    if(column==5){
-      row+=1
-      column = 0
-    }
-    console.log(roads)
-  }
+} 
+function isVertexConnected(vertex: Vertex, roads: road[]) {
+  return roads.some(road =>
+    (vertex.row === road.from.row && vertex.column === road.from.column) ||
+    (vertex.row === road.to.row && vertex.column === road.to.column)
+  )
 }
-  function checkRoad(from:Vertex,to:Vertex){
-    const differenceRow = from.row-to.row
-    const differenceColumn = from.column-to.column
-    return ((differenceColumn==0&&differenceRow==1)||(differenceColumn==1&&differenceRow==0))
-  }
-  async function bulidRoad(from:Vertex,to:Vertex,userId:string,gameId:string){
-    if (!checkRoad(from,to)){
-      return
-    }
-    else{
 
+function isAdjacent(v1: Vertex, v2: Vertex) {
+  return (
+    (v1.row == v2.row && Math.abs(v1.column - v2.column) === 1) ||
+    (v1.column === v2.column && Math.abs(v1.row - v2.row) === 1)
+  );
+}
+  async function BuildRoad(userId:string,gameId:string,playerRoads:road[],newRoad:road,playerSettlements:Vertex[]){
+    const connectedSettlement = playerSettlements.some((settlement)=>{
+       return (newRoad.from.row == settlement.row && newRoad.from.column == settlement.column) || (newRoad.to.row == settlement.row&&newRoad.to.column == settlement.column)
+    })
+    const connectedRoad = playerRoads.some((road)=>{
+      return (isAdjacent(road.from, newRoad.from) ||
+    isAdjacent(road.to, newRoad.from) ||
+    isAdjacent(road.from, newRoad.to) ||
+    isAdjacent(road.to, newRoad.to))
+    })
+    const roadExists = playerRoads.some(road =>
+  ((road.from.row === newRoad.from.row && road.from.column === newRoad.from.column) &&
+   (road.to.row === newRoad.to.row && road.to.column === newRoad.to.column)) ||
 
+  ((road.from.row === newRoad.to.row && road.from.column === newRoad.to.column) &&
+   (road.to.row === newRoad.from.row && road.to.column === newRoad.from.column))
+);
+    if ((connectedRoad || connectedSettlement) && !roadExists){
+      const { data, error } = await supabase
+  .from('roads')
+  .insert({
+    game_id: gameId,
+    player_id: userId,
+    from: newRoad.from,  
+    to: newRoad.to,      
+  }).select();
+  console.log(data)
+  console.log(error)
+  await buyRoad(userId,gameId)
     }
+    
   }
+  
+  async function buyRoad(userId:string,gameId:string) {
+    await increment('wood',-1,userId,gameId)
+    await increment('brick',-1,userId,gameId)
+
+    
+  }
+  
 
     
 
@@ -252,7 +275,8 @@ const total = resourceKeys.reduce((sum, key) => sum + (player[key] || 0), 0)
   return {
     addSettelement,
     increment,
-    getPlayers
+    getPlayers,
+    BuildRoad
     
   }
 })

@@ -57,8 +57,7 @@ export interface Vertex{
   column:number
 }
 export interface road{
-  game_id:string,
-  player_id:string,
+  
   from:Vertex,
   to:Vertex,
 }

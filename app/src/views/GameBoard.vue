@@ -9,7 +9,10 @@
   :user="findProfileById(trade.init_id)"
   @playerTrade="handlePlayerResponse(trade)"
 />
-
+  <RoadLogic
+  v-for="road in roads"
+  @buildRoad="buildRoad(road)"
+  />
 
     <div >
         {{ players }}
@@ -24,7 +27,7 @@
         <button @click ="game.turnOrder(id)">if your happy</button>
     </div>
     
-    <p v-if="game.current_player!==use_profile.profile?.id">hey its not</p>
+    <p v-if="game.current_player==use_profile.profile?.id">end turn</p>
 
 </template>
 
@@ -41,9 +44,13 @@ import { useRoute,useRouter } from 'vue-router';
 import { gameLogic } from '@/stores/setup';
 import { gameLoop } from '@/stores/gameloop';
 import { tradeStore } from '@/stores/trades';
-import { type profileType, type roomPlayers, type Trade } from '@/types/types';
+import { type profileType, type road, type roomPlayers, type Trade } from '@/types/types';
 import TradeRequest from '@/components/Trades/TradeRequest.vue';
 import TradeResponse from '@/components/Trades/TradeResponse.vue';
+import UserProfile from '@/components/UserProfile.vue';
+import type { PostgrestError } from '@supabase/supabase-js';
+import RoadLogic from '@/components/Board/RoadLogic.vue';
+import { roads } from '@/vertex';
 const game = gameLogic()
 const use_profile=profileStore()
 const loading = ref<boolean>(false)
@@ -130,7 +137,16 @@ const exists = initiatorProfiles.value.find(p => p.id === trade.init_id);
 function findProfileById(id: string): profileType | null {
   return initiatorProfiles.value.find(p => p.id === id) ?? null
 }
+async function buildRoad(road:road){
+const {data,error}:{data:road[]|null,error:PostgrestError|null} =await supabase.from('roads').select().eq('player_id',use_profile.profile?.id)
+const { data: settlementData,error:settlememt } = await supabase.from('settlements').select().eq('game_id', id.value).eq('player_id',use_profile.profile?.id)
 
+console.log(settlememt)
+if(use_profile.profile?.id&&data&&settlementData){
+  await gameLoop().BuildRoad(use_profile.profile?.id,id.value,data,road,settlementData)
+
+}
+}
 
 async function handleDelete(){
     await rooms().deleteRoom(id.value)
@@ -174,6 +190,22 @@ async function subscriptions(game_id:string){
         await loadInitiatorProfiles(trades.value);
       }
     )
+    .subscribe()
+    const gameChannel = supabase.channel('game_turn')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'trades',
+        filter: `game_id=eq.${game_id}`
+      },
+      async (payload) => {
+        console.log("Realtime payload turn", payload)
+// if (payload.new.turn_index !== undefined && players.value.length > 0) {
+//   game.current_player.value = players.value[payload.new.turn_index].player_id_game;
+// }      }
+})
     .subscribe()
     }
 </script>
