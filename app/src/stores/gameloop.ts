@@ -38,8 +38,9 @@ export const gameLoop = defineStore('gameLoop', () => {
     await increment('wheat',-1,userId,gameId)
   }
   async function addSettelement(position: Vertex) {
-
+    console.log(position)
   const game_id = gameLogic().route_id
+  
   const userId = use_profile.profile?.id
   if (!userId) return
 
@@ -65,6 +66,7 @@ export const gameLoop = defineStore('gameLoop', () => {
     .eq('game_id', game_id)
 
   if (tilesWithSettlements) {
+    console.log(tilesWithSettlements)
     for (const tileWithSettlements of tilesWithSettlements) {
 
       for (const existingSettlement of tileWithSettlements.settlements) {
@@ -122,8 +124,9 @@ if(currentPlayer.wood>=1&&currentPlayer.wheat>=1&&currentPlayer.sheep>=1&&curren
 
   
   allPlayers.value = (await getPlayers()) || []
+  
   await resourceDistribution(game_id)
-  await subscriptions(gameLogic().route_id)
+  
   await profileStore().getGameProfile(gameLogic().route_id)
 }
 
@@ -141,7 +144,7 @@ if(currentPlayer.wood>=1&&currentPlayer.wheat>=1&&currentPlayer.sheep>=1&&curren
         return true
     }
     async function getPlayers():Promise<roomPlayers[]|null>{
-        const {data:gamePlayers,error:gameError} = await supabase.from('game_players').select().eq('game_id',gameLogic().route_id)
+        const {data:gamePlayers,error:gameError}= await supabase.from('game_players').select().eq('game_id',gameLogic().route_id)
         
         return gamePlayers
     }
@@ -150,6 +153,7 @@ if(currentPlayer.wood>=1&&currentPlayer.wheat>=1&&currentPlayer.sheep>=1&&curren
         const diceRoll =  7
         if(diceRoll==7){
           await loseRandomResources()
+          return
         }
         const {data:validSet,error:errorSet}:{data:Tiles[]|null,error:PostgrestError|null}=await supabase.from('tiles').select().eq('number',diceRoll).eq('game_id',gameLogic().route_id).not('settlements', 'eq', '{}')
         
@@ -182,6 +186,7 @@ for (const tile of validSet){
     
 
 async function loseRandomResources() {
+  allRoads()
   type ResourceKey = 'wood' | 'brick' | 'sheep' | 'wheat' | 'ore'
 
   const resourceKeys:ResourceKey[] =  ['wood', 'brick', 'sheep', 'wheat', 'ore']
@@ -195,17 +200,39 @@ const total = resourceKeys.reduce((sum, key) => sum + (player[key] || 0), 0)
     const randKey = available[Math.floor(Math.random() * available.length)]
     player[randKey]-=1
   }
-  await supabase.from('game_players').update(player).eq('player_id_game',player.player_id_game)
+  const updatedResources = {
+  wood: player.wood,
+  brick: player.brick,
+  wheat: player.wheat,
+  ore: player.ore,
+  sheep: player.sheep,
+}
+  await supabase.from('game_players').update(updatedResources).eq('player_id_game',player.player_id_game)
   console.log(player)
 }
   
   
   
+} function allRoads(){
+  let roads =[]
+  let row=0
+  let column = 0
+  while(row<5&&column<5){
+    roads.push({from:{row:row,column:column},to:{row:row+1,column:column}})
+    roads.push({from:{row:row,column:column},to:{row:row,column:column+1}})
+    
+    column+=1
+    if(column==5){
+      row+=1
+      column = 0
+    }
+    console.log(roads)
+  }
 }
   function checkRoad(from:Vertex,to:Vertex){
     const differenceRow = from.row-to.row
     const differenceColumn = from.column-to.column
-    return ((differenceColumn==0&&differenceRow==1)||differenceColumn==1&&differenceRow==0)
+    return ((differenceColumn==0&&differenceRow==1)||(differenceColumn==1&&differenceRow==0))
   }
   async function bulidRoad(from:Vertex,to:Vertex,userId:string,gameId:string){
     if (!checkRoad(from,to)){
@@ -213,21 +240,11 @@ const total = resourceKeys.reduce((sum, key) => sum + (player[key] || 0), 0)
     }
     else{
 
+
     }
   }
 
-    async function subscriptions(game_id:string){
-        const myChannel= supabase.channel('game_players_resource')
-  .on(
-    'postgres_changes',
-    { event: '*' ,
-    schema:'public',
-    table:'game_players',
-    filter:`game_id=eq.${game_id}`,},
-    (payload)=>console.log(payload)
-  )
-  .subscribe()
-    }
+    
 
     
   
@@ -235,6 +252,7 @@ const total = resourceKeys.reduce((sum, key) => sum + (player[key] || 0), 0)
   return {
     addSettelement,
     increment,
+    getPlayers
     
   }
 })

@@ -1,15 +1,20 @@
 <template>
-    <div >
-        
-        <IndividualTile
-        v-if="game.individualTiles"
-        v-for="(tile,index) in game.individualTiles"
-        :key = "index"
-        :tile = "tile"
-        :isTurn = "isTurn"
-        @settle = "handleSettle"
-        />
-    </div>
+    <div class="flex items-center justify-center min-h-screen">
+  <div class="grid grid-cols-5 max-w-3xl">
+    <IndividualTile
+      v-if="game.individualTiles"
+      v-for="(tile,index) in game.individualTiles"
+      :key="index"
+      :tile="tile"
+      :isTurn="isTurn"
+      @settle="handleSettle"
+    />
+    
+  </div>
+  <!-- Road Buttons Layer -->
+    
+</div>
+
     
 </template>
 
@@ -29,6 +34,10 @@ async function handleSettle(tile:{row:number,column:number}){
 const props =defineProps<{
     isTurn:boolean
 }>()
+
+
+
+
 console.log(2)
 </script>
 

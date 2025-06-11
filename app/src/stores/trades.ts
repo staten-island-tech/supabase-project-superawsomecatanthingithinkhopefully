@@ -4,12 +4,21 @@ import { supabase } from '@/lib/supabaseClient'
 import { gameLogic } from './setup'
 import { profileStore } from './profile'
 import { type Ref } from 'vue'
-import { type RoomInfo, type roomPlayers,type Tiles } from '@/types/types'
+import { type RoomInfo, type roomPlayers,type Tiles, type Trade } from '@/types/types'
 import type { PostgrestError, PostgrestSingleResponse } from '@supabase/supabase-js'
 import { rooms } from './rooms'
 import { gameLoop } from './gameloop'
 
-export const trades = defineStore('trades', () => {
+export const tradeStore = defineStore('trades', () => {
+    const currentTrade = ref<{
+  initiatingPlayer: string
+  recievingPlayer: string
+  initResource: number
+  typeInitResource: string
+  recieveResource: number
+  typeRecieveResource: string
+  gameId: string
+} | null>(null)
     async function bankTrade(tradeIn:number,typeIn:string,typeOut:string,userId:string,gameId:string){
         const { data: player, error } = await supabase
     .from('game_players')
@@ -21,6 +30,7 @@ export const trades = defineStore('trades', () => {
             return
         }
         else{
+            
             await gameLoop().increment(typeIn,-3,userId,gameId)
             await gameLoop().increment(typeOut,1,userId,gameId)
         }
@@ -30,23 +40,51 @@ export const trades = defineStore('trades', () => {
     .from('game_players')
     .select()
     .eq('player_id_game', initiatingPlayer)
+    .eq('game_id',gameId)
     .single()
+    
+    console.log(initError)
+    console.log("ts is init",initPlayer)
     const { data: recievePlayer, error:reciever } = await supabase
     .from('game_players')
     .select()
     .eq('player_id_game', recievingPlayer)
+    .eq('game_id',gameId)
     .single()
+
+    
+    console.log("ts is recieve",recievePlayer,reciever)
     if (initPlayer[typeInitResource]>=initResource && recievePlayer[typeRecieveResource] >= recieveResource){
-        await gameLoop().increment(typeInitResource,initResource,initiatingPlayer,gameId)
+        await gameLoop().increment(typeInitResource,-initResource,initiatingPlayer,gameId)
         await gameLoop().increment(typeRecieveResource,recieveResource,initiatingPlayer,gameId)
 
         await gameLoop().increment(typeInitResource,initResource,recievingPlayer,gameId)
-        await gameLoop().increment(typeRecieveResource,recieveResource,recievingPlayer,gameId)
+        await gameLoop().increment(typeRecieveResource,-recieveResource,recievingPlayer,gameId)
     }
-
-    }
-  return {
     
+    }
+    async function offerTrade(initiatingPlayer:string,initResource:number,typeInitResource:string,recieveResource:number,typeRecieveResource:string,gameId:string){
+         
+        
+        const {data,error} = await supabase.from('trades').insert({init_id:initiatingPlayer,init_type:typeInitResource,init_quant:initResource,recieve_type:typeRecieveResource,recieve_quant:recieveResource,game_id:gameId}).select().single()
+    console.log(error)
+        if(data&&!error){
+        return data
+    }
+    }
+    async function fetchTradeResults(gameId:string){
+        const {data,error}:{data:Trade[]|null,error:PostgrestError|null} = await supabase.from('trades').select().eq('game_id',gameId)
+        console.log(data)
+        console.log(error)
+        return data
+    }
+    
+    
+  return {
+    bankTrade,
+    offerTrade,
+    fetchTradeResults,
+    playerTrades
     
   }
 })

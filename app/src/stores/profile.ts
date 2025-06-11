@@ -20,7 +20,12 @@ export const profileStore = defineStore('profileStore', () => {
         if(profile.value){
             const {data,error} = await supabase.from('game_players').select().eq('player_id_game',profile.value.id).eq('game_id',route_id).single()
             gameProfile.value = data
+            return gameProfile.value
         }
+    }
+    async function fetchUserById(id:string){
+        const {data} =await supabase.from('profiles').select().eq('id',id).single()
+        return data
     }
 
     
@@ -29,7 +34,8 @@ export const profileStore = defineStore('profileStore', () => {
         fetchUserProfile,
         profile,
         getGameProfile,
-        gameProfile
+        gameProfile,
+        fetchUserById
         
     }
   })

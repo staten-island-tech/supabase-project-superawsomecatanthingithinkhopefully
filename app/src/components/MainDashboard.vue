@@ -40,7 +40,7 @@
       </div>
       <div v-for="data in fetched_data">
         
-          <button @click="use_rooms.joinRoom(data.id,true)" class="absolute  bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game. </button>
+          <button @click="use_rooms.joinRoom(data.id,true)" class="  bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game. </button>
       </div>
       <div v-if="fetched_data&&fetched_data.length==0">
         <p>No Rooms currently. Make one</p>

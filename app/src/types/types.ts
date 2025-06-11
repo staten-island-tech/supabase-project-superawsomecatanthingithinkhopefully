@@ -67,3 +67,12 @@ export interface Settlement{
   position:{row:number,column:number},
   isCity:boolean
 }
+export interface Trade {
+  id: string            
+  game_id: string        
+  init_id: string        
+  init_type: string      
+  init_quant: number     
+  recieve_type: string   
+  recieve_quant: number  
+}
