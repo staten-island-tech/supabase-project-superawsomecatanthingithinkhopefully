@@ -44,9 +44,16 @@ const router = createRouter({
       
     },
     {
-      path:'/:gameid',
+      path:'/:gameid-lobby',
       name:'game',
       component: StartGame,
+      //component:GameBoard,
+      //Changed from Eyads code. Make a seperate route to the GameBoard
+    },
+    {
+      path:'/:gameid',
+      name:'game_play',
+      component: GameBoard,
       //component:GameBoard,
       //Changed from Eyads code. Make a seperate route to the GameBoard
     },

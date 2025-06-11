@@ -19,9 +19,9 @@
 
     <div class="static">
 
-      <div class="avatar absolute top-5 right-5">
+      <div v-if="profile_picture" class="avatar absolute top-5 right-5">
         <div class="w-24 rounded-full">
-          <RouterLink to="/AccountStuff"><img src="/profile_temp.jpg" alt="profile_pic"/></RouterLink>
+          <RouterLink to="/AccountStuff"><img :src="profile_picture" alt="profile_pic"/></RouterLink>
           
         </div>
         
@@ -32,21 +32,21 @@
       
 
 
-      <div class="absolute bottom-80 left-133">
+      <div  class="relative top-[10vw] left-[42vw] h-60 w-60">
         <img class='h-60 w-60' src="/Logo.png" alt="Temp">
 
-      </div v-for="">
+      </div>
 
       </div>
-      <div v-for="data in fetched_data">
+      <div >
         
-          <button @click="use_rooms.joinRoom(data.id,true)" class="absolute  bottom-50 left-145 bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game. </button>
+        <button @click="use_rooms.joinRoom(data.id,true)" class="relative top-[10vw] left-[46vw] bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game. </button>
       </div>
       <div v-if="fetched_data&&fetched_data.length==0">
         <p>No Rooms currently. Make one</p>
       </div>
 
-      <div class="glass absolute bottom-20 left 0 w-100 h-125">
+      <div class="glass absolute bottom-20 left-0 w-100 h-125">
         <h2 class="absolute bottom-110 left-30 text-2xl font-bold underline">Create Room</h2>
 
         <form @submit.prevent="handleRoom">
@@ -79,16 +79,20 @@ import { rooms } from '@/stores/rooms'
 import { homePage } from '@/stores/homepage'
 import routers from '@/router'
 import { onMounted,ref } from 'vue'
+import { supabase } from '@/lib/supabaseClient'
+import type { PostgrestError } from '@supabase/supabase-js'
 
 const use_rooms = rooms()
 const use_user = homePage()
+
+const profile_picture = ref()
 
 const router = useRouter()
 async function handleRoom() {
   const result = await use_rooms.makeRoom()
   
   if (result) {
-    router.push({ path: `/${result['id']}` })
+    router.push({ path: `/${result['id']}-lobby` })
   }
 }
 const fetched_data = ref<RoomInfo[]|undefined>([])
@@ -98,6 +102,10 @@ onMounted(async ()=>{
   const room_data = await use_rooms.fetchRooms()
   fetched_data.value = room_data
   data.value = user_info 
+  
+  const {data:pic, error} = await supabase.from('profiles').select('profile_pic').eq('id', data.value?.id).single()
+  profile_picture.value = pic?.profile_pic
+  console.log(profile_picture.value)
 })
 
 

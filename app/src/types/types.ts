@@ -70,3 +70,5 @@ export interface GamePlayer{
   player_id_game: string
   color: string | null
 }
+
+

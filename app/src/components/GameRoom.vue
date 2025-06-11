@@ -54,6 +54,7 @@
         
       </div>
     </div>
+    <button @click="startGame()" class="relative top-[40vw] left-[46vw] bg-green-400 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-full">Start Game</button>
   </div>
   
 </template>
@@ -78,6 +79,8 @@ import LogIn from './LogIn.vue'
 const players = ref<any>([])
 const player_names = ref()
 
+let subscription: any
+
 const router = useRoute()
 const routers = useRouter()
 const gameStore = gamers()
@@ -86,12 +89,26 @@ const room_id = router.params.gameid as string
 
 const host_username = ref()
 
+
+
 async function handleDeletion() {
   console.log(room_id)
   await use_rooms.deleteRoom(room_id)
 
   routers.push({ path: '/dash' })
 }
+
+async function startGame() {
+  const { error } = await supabase
+    .from('game_players')
+    .update({ game_started: true })
+    .eq('game_id', room_id)
+
+  if (error) {
+    console.error('Error starting game:', error)
+  }
+}
+
 const use_profile = profileStore()
 const auth = ref<User | null>(null)
 onMounted(async () => {
@@ -185,6 +202,28 @@ onMounted(async () => {
       }
   )
   .subscribe()
+
+  subscription = supabase
+    .channel('room_updates')
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'game_players',
+        filter: `game_id=eq.${room_id}`
+      },
+      (payload) => {
+        
+        const newData = payload.new
+        console.log(newData, 'pushing')
+        if (newData.game_started) {
+          routers.push({ path: `/${room_id}` })
+        }
+      }
+    )
+    .subscribe()
+  
 
 
 
