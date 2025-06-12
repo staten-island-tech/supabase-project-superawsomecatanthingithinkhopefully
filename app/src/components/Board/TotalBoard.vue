@@ -8,6 +8,8 @@
       :tile="tile"
       :isTurn="isTurn"
       @settle="handleSettle"
+      @buildRoad="$emit('buildRoad',$event),console.log($event)"
+      
     />
     
   </div>
@@ -20,6 +22,7 @@
 </template>
 
 <script setup lang="ts">
+const emit = defineEmits(['buildRoad'])
 import { gameLogic } from '@/stores/setup';
 import IndividualTile from './IndividualTile.vue';
 import { gameLoop } from '@/stores/gameloop';

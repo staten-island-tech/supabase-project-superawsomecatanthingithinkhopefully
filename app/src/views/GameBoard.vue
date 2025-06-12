@@ -9,16 +9,13 @@
   :user="findProfileById(trade.init_id)"
   @playerTrade="handlePlayerResponse(trade)"
 />
-  <RoadLogic
-  v-for="road in roads"
-  @buildRoad="buildRoad(road)"
-  />
+  
 
     <div >
         {{ players }}
     </div>
     <div>
-        <TotalBoard :isTurn="myTurn" v-if="loading === true"/>
+        <TotalBoard :isTurn="myTurn" v-if="loading === true" @buildRoad="buildRoad" />
         
         <div v-else>
             <p>im loading gimme a sec</p>
@@ -163,9 +160,10 @@ function findProfileById(id: string): profileType | null {
   return initiatorProfiles.value.find(p => p.id === id) ?? null
 }
 async function buildRoad(road:road){
+  console.log(road)
 const {data,error}:{data:road[]|null,error:PostgrestError|null} =await supabase.from('roads').select().eq('player_id',use_profile.profile?.id)
 const { data: settlementData,error:settlememt } = await supabase.from('settlements').select().eq('game_id', id.value).eq('player_id',use_profile.profile?.id)
-
+console.log(use_profile.profile?.id)
 console.log(settlememt)
 if(use_profile.profile?.id&&data&&settlementData){
   await gameLoop().BuildRoad(use_profile.profile?.id,id.value,data,road,settlementData)
