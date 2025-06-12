@@ -1,23 +1,31 @@
 <template>
-    <BankTrade @trade = "handleBankTrade"/>
-    <TradeRequest @playerTrade = "handlePlayerTrade"/>
+  <div class="relative">
+    <div class="absolute top-0 right-0">
+      <button @click="toggle_trades()">View Trades</button>
+      <BankTrade v-if="show_trades" @trade = "handleBankTrade"/>
+      <TradeRequest v-if="show_trades" @playerTrade = "handlePlayerTrade"/>
+    </div>
+    
+    
+    
     <TradeResponse
-  v-for="(trade, index) in trades"
-  :key="index"
-  :recieve="{ quantity: trade.recieve_quant, type: trade.recieve_type }"
-  :give="{ quantity: trade.init_quant, type: trade.init_type }"
-  :user="findProfileById(trade.init_id)"
-  @playerTrade="handlePlayerResponse(trade)"
-/>
-  <RoadLogic
-  v-for="road in roads"
-  @buildRoad="buildRoad(road)"
-  />
+    v-for="(trade, index) in trades"
+    :key="index"
+    :recieve="{ quantity: trade.recieve_quant, type: trade.recieve_type }"
+    :give="{ quantity: trade.init_quant, type: trade.init_type }"
+    :user="findProfileById(trade.init_id)"
+    @playerTrade="handlePlayerResponse(trade)"
+    />
+    <!-- <RoadLogic
+    v-for="road in roads"
+    @buildRoad="buildRoad(road)"
+    /> -->
 
     <div >
         {{ players }}
     </div>
-    <div>
+   
+    <div class="absolute top-0 left-0">
         <TotalBoard :isTurn="myTurn" v-if="loading === true"/>
         
         <div v-else>
@@ -27,6 +35,8 @@
         
         <button v-if="myTurn" @click ="game.turnOrder(id)" :disabled="isInitialPlacementPhase">end turn</button>
     </div>
+  </div>
+    
     
 
 </template>
@@ -58,6 +68,17 @@ const isCreator = ref<boolean|null>(null)
 const id = ref<string>('')
 const players =ref<roomPlayers[]|null>(null)
 const trades = ref<Trade[]|null>()
+
+const show_trades = ref<boolean>(false)
+function toggle_trades(){
+  if (show_trades.value === false){
+    show_trades.value = true
+    console.log(show_trades.value, 'thing')
+  } else if(show_trades.value === true){
+    show_trades.value = false
+    console.log(show_trades.value, 'thing')
+  }
+}
 
 
 const router=useRouter()
