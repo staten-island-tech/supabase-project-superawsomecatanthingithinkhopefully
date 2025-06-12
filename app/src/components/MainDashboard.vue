@@ -38,10 +38,16 @@
       </div>
 
       </div>
-      <div >
-        
-        <button @click="use_rooms.joinRoom(data.id,true)" class="relative top-[10vw] left-[46vw] bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full">Join a game. </button>
-      </div>
+      <div v-if="fetched_data && fetched_data.length > 0" class="flex flex-col items-center mt-10 space-y-6">
+  <div 
+    v-for="room in fetched_data" 
+    :key="room.id"
+    class="bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full cursor-pointer w-fit"
+    @click="use_rooms.joinRoom(room.id, true)"
+  >
+    Join Room {{ room.id }}
+  </div>
+</div>
       <div v-if="fetched_data&&fetched_data.length==0">
         <p>No Rooms currently. Make one</p>
       </div>
@@ -65,6 +71,7 @@
       </div>
       
     </div>
+
     
 
   

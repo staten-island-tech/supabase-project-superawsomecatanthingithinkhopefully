@@ -1,43 +1,296 @@
 <template>
-    <div>
-        <TotalBoard v-if="loading === true"/>
+  <div class="relative">
+    <div class="absolute top-0 right-0">
+      <button @click="toggle_trades()">View Trades</button>
+      <BankTrade v-if="show_trades" @trade = "handleBankTrade"/>
+      <TradeRequest v-if="show_trades" @playerTrade = "handlePlayerTrade"/>
+    </div>
+    
+    
+    
+    <TradeResponse
+    v-for="(trade, index) in trades"
+    :key="index"
+    :recieve="{ quantity: trade.recieve_quant, type: trade.recieve_type }"
+    :give="{ quantity: trade.init_quant, type: trade.init_type }"
+    :user="findProfileById(trade.init_id)"
+    @playerTrade="handlePlayerResponse(trade)"
+    />
+    <!-- <RoadLogic
+    v-for="road in roads"
+    @buildRoad="buildRoad(road)"
+    /> -->
+
+    <div >
+        {{ players }}
+    </div>
+   
+    <div class="absolute top-0 left-0">
+        <TotalBoard :isTurn="myTurn" v-if="loading === true"/>
+        
         <div v-else>
             <p>im loading gimme a sec</p>
         </div>
         <DeleteButton v-if="isCreator!=null":isCreator="isCreator"  @delete="handleDelete"/>
+        
+        <button v-if="myTurn" @click ="game.turnOrder(id)" :disabled="isInitialPlacementPhase">end turn</button>
     </div>
+  </div>
+    
+    
+
 </template>
 
 <script setup lang="ts">
 const use_rooms = rooms()
-import DeleteButton from '@/components/Game/DeleteButton.vue';
-import TotalBoard from '@/components/Game/TotalBoard.vue';
+import BankTrade from '@/components/Trades/BankTrade.vue';
+import DeleteButton from '@/components/DeleteButton.vue';
+import TotalBoard from '@/components/Board/TotalBoard.vue';
 import { rooms } from '@/stores/rooms';
-import { onMounted,ref } from 'vue';
+import { supabase } from '@/lib/supabaseClient'
+import { onMounted,ref,computed } from 'vue';
 import { profileStore } from '@/stores/profile';
 import { useRoute,useRouter } from 'vue-router';
 import { gameLogic } from '@/stores/setup';
+import { gameLoop } from '@/stores/gameloop';
+import { tradeStore } from '@/stores/trades';
+import { type profileType, type road, type roomPlayers, type Trade } from '@/types/types';
+import TradeRequest from '@/components/Trades/TradeRequest.vue';
+import TradeResponse from '@/components/Trades/TradeResponse.vue';
+import UserProfile from '@/components/UserProfile.vue';
+import type { PostgrestError } from '@supabase/supabase-js';
+import RoadLogic from '@/components/Board/RoadLogic.vue';
+import { roads } from '@/vertex';
 const game = gameLogic()
 const use_profile=profileStore()
 const loading = ref<boolean>(false)
 const isCreator = ref<boolean|null>(null)
 const id = ref<string>('')
+const players =ref<roomPlayers[]|null>(null)
+const trades = ref<Trade[]|null>()
+
+const show_trades = ref<boolean>(false)
+function toggle_trades(){
+  if (show_trades.value === false){
+    show_trades.value = true
+    console.log(show_trades.value, 'thing')
+  } else if(show_trades.value === true){
+    show_trades.value = false
+    console.log(show_trades.value, 'thing')
+  }
+}
+
+
 const router=useRouter()
 onMounted(async()=>{
 
     id.value = useRoute().params.gameid as string
-    console.log("ts is the id",id)
     await game.updateRoute(id.value)
     await use_profile.fetchUserProfile()
-    await use_profile.getGameProfile(id.value)
+    players.value = await gameLoop().getPlayers()
+    await game.determineTurn(id.value)
+    await subscriptions(id.value)
+    trades.value = await tradeStore().fetchTradeResults(id.value)
+    await loadInitiatorProfiles(trades.value);
     isCreator.value = await rooms().fetchRoomCreator(id.value,use_profile.profile?.id)
-    await game.turnOrder()
+    console.log("this is gam baord")
+console.log(use_profile.profile?.id === game.current_player)
     loading.value = true
 })
+const tradeData = ref<Trade|null>(null)
+async function handlePlayerTrade(selectedPlayerResource:string,selectedPlayerQuantity:number,desiredPlayerResource:string,desiredPlayerQuantity:number){
+if (
+  
+  use_profile.profile?.id &&
+  id.value
+)
+
+    {
+        console.log(1)
+        const data =await tradeStore().offerTrade(
+  profileStore().profile?.id as string,
+  selectedPlayerQuantity,  
+  selectedPlayerResource,       
+    desiredPlayerQuantity,    
+  desiredPlayerResource,        
+
+      
+  id.value
+) 
+tradeData.value = data
+console.log(data)
+initPlayerProfile.value = await use_profile.fetchUserById(use_profile.profile.id)
+console.log(initPlayerProfile.value)
+}}
+const isInitialPlacementPhase = ref<boolean>(true)
+async function checkInitialPlacementStatus() {
+  if (!use_profile.profile?.id || !id.value) return
+
+  const { data, error } = await supabase
+    .from('settlements')
+    .select() 
+    .eq('player_id', use_profile.profile.id)
+    .eq('game_id', id.value)
+
+  if (error) {
+    console.error('Error checking placement status:', error)
+    return
+  }
+    console.log(isInitialPlacementPhase.value)
+
+  if(data.length>2){
+    isInitialPlacementPhase.value=false
+        console.log(isInitialPlacementPhase.value)
+
+  }
+}
+const initPlayerProfile=ref<profileType|null>(null)
+async function handlePlayerResponse(trade: Trade) {
+  if (trade && use_profile.profile?.id && id.value) {
+    await tradeStore().playerTrades(
+      trade.init_id,
+      use_profile.profile.id,
+      trade.init_quant,
+      trade.init_type,
+      trade.recieve_quant,
+      trade.recieve_type,
+      id.value
+    )
+    console.log("Trade accepted.")
+  }
+}
+const myTurn = computed(()=>{
+    return use_profile.profile?.id === game.current_player
+})
+const winner = computed(() => {
+  return players.value?.find(player => player.vp >= 10) 
+});
+const initiatorProfiles = ref<profileType[]>([]);
+
+async function loadInitiatorProfiles(trades: Trade[] | null) {
+  if (!trades) return;
+
+  for (const trade of trades) {
+const exists = initiatorProfiles.value.find(p => p.id === trade.init_id);
+    if (!exists) {
+  const profile = await use_profile.fetchUserById(trade.init_id);
+  if (profile) {
+    initiatorProfiles.value.push(profile);
+  }
+}
+  }
+}
+function findProfileById(id: string): profileType | null {
+  return initiatorProfiles.value.find(p => p.id === id) ?? null
+}
+async function buildRoad(road:road){
+const {data,error}:{data:road[]|null,error:PostgrestError|null} =await supabase.from('roads').select().eq('player_id',use_profile.profile?.id)
+const { data: settlementData,error:settlememt } = await supabase.from('settlements').select().eq('game_id', id.value).eq('player_id',use_profile.profile?.id)
+
+console.log(settlememt)
+if(use_profile.profile?.id&&data&&settlementData){
+  await gameLoop().BuildRoad(use_profile.profile?.id,id.value,data,road,settlementData)
+
+}
+}
+
 async function handleDelete(){
     await rooms().deleteRoom(id.value)
     router.push('/dash')
 }
+
+async function handleBankTrade(selectedBankResource:string,desiredBankResource:string){
+    if(use_profile.profile){
+        await tradeStore().bankTrade(3,selectedBankResource,desiredBankResource,use_profile.profile.id,id.value)
+
+    }
+
+}
+async function subscriptions(game_id:string){
+  const winnerAlerted = ref<boolean>(false);
+        const myChannel= supabase.channel('game_players_resource')
+  .on(
+    'postgres_changes',
+    { event: '*' ,
+    schema:'public',
+    table:'game_players',
+    filter:`game_id=eq.${game_id}`},
+    async (payload) => {
+        console.log("Realtime payload:", payload)
+
+        const updatedPlayers = await gameLoop().getPlayers()
+        players.value = updatedPlayers
+      const winner = updatedPlayers?.find((player)=>{
+          return player.vp == 10
+        })
+      if (winner&&!winnerAlerted.value) {
+        alert(`a player has won the game!`)
+        router.push('/dash')
+        winnerAlerted.value = true
+        setTimeout(() => {
+    router.push('/dash');
+  }, 100);
+        await supabase.from('game').delete().eq('id',game_id)
+      }
+      
+      }
+        
+  )
+  .subscribe()
+   const tradeChannel = supabase.channel('game_trades_trades')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'trades',
+        filter: `game_id=eq.${game_id}`
+      },
+      async (payload) => {
+        console.log("Realtime payload (trades):", payload)
+        trades.value = await tradeStore().fetchTradeResults(game_id)
+        await loadInitiatorProfiles(trades.value);
+      }
+    )
+    .subscribe()
+    const gameChannel = supabase.channel('game_turn')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'game',
+        filter: `id=eq.${game_id}`
+      },
+      async (payload) => {
+        console.log("Realtime payload turn", payload)
+
+const newPayload = payload.new as { turn_index?: number, [key: string]: any };
+
+if (newPayload.turn_index !== undefined && players.value&& players.value.length > 0) {
+  game.current_player = players.value?.[newPayload.turn_index].player_id_game;
+}
+
+console.log(game.current_player)
+
+const settlementsChannel = supabase
+  .channel('settlement_updates')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'settlements',
+      filter: `player_id=eq.${use_profile.profile?.id}`
+    },
+    async () => {
+      await checkInitialPlacementStatus()
+    }
+  )
+  .subscribe()
+})
+    .subscribe()
+    }
 </script>
 
 <style scoped>

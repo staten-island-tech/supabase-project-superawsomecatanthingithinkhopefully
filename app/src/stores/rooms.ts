@@ -36,7 +36,7 @@ export const rooms = defineStore('rooms', () => {
         if (data){
             id.value = data[0].id
             isCreator.value = true
-            await joinRoom(id.value,false)
+            await joinRoom(id.value,true)
             gameLogic().route_id = id.value
             
             return {id:id.value}
@@ -62,15 +62,14 @@ export const rooms = defineStore('rooms', () => {
     console.log(deleted_error)
   }
   async function joinRoom(id:string,push:boolean){
-  
-    
     const {data:userData,error:userError} = await supabase.auth.getUser()
     if(userData.user){
           const {data:lengthPlayers,error:lengthError} = await supabase.from('game_players').select().eq('player_id_game',userData.user.id).eq('game_id',id)
       if(lengthPlayers&&lengthPlayers.length>0){
-        
+        console.log(lengthError)
       }
       else{
+        console.log("...")
         const { data, error } = await supabase
   .from('game_players')
   .insert({
@@ -83,7 +82,7 @@ export const rooms = defineStore('rooms', () => {
     
     if(push){
       
-      router.push({path:`/${id}`})
+      router.push({path:`/${id}-lobby`})
     }
     isCreator.value = false
     }

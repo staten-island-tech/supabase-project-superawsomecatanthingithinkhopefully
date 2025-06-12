@@ -2,7 +2,9 @@
 export interface RoomInfo {
   id: string;
   number_player: number;
-  turn_number:number
+  round:number;
+  turn_index:number
+
 
 }
 export interface profileType {
@@ -59,6 +61,29 @@ export interface roomPlayers{
   ore:number,
   wheat:number,
 
+}
+export interface Vertex{
+  row:number,
+  column:number
+}
+export interface road{
+  
+  from:Vertex,
+  to:Vertex,
+}
+export interface Settlement{
+  player_id:string,
+  position:{row:number,column:number},
+  isCity:boolean
+}
+export interface Trade {
+  id: string            
+  game_id: string        
+  init_id: string        
+  init_type: string      
+  init_quant: number     
+  recieve_type: string   
+  recieve_quant: number  
 }
 
 export interface player_card{
