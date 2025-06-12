@@ -9,7 +9,8 @@ export interface profileType {
   id: string;
   username: string;
   wins:number;
-  losses:number
+  losses:number;
+  profile_pic: string;
   
 
 }
