@@ -91,7 +91,7 @@ export const gameLoop = defineStore('gameLoop', () => {
   }
 
   if (
-    gameData.turn_index >= 2 &&
+    gameData.round >= 2 &&
     !isVertexConnected(position, playerRoads || [])
   ) return
 
@@ -114,7 +114,6 @@ export const gameLoop = defineStore('gameLoop', () => {
   }
 
   allPlayers.value = (await getPlayers()) || []
-  await resourceDistribution(game_id)
   await profileStore().getGameProfile(game_id)
 }
 
@@ -127,19 +126,19 @@ export const gameLoop = defineStore('gameLoop', () => {
         if((newRow==0&&newColumn==0&&!isCity)){
           return 'upgrade'
         }
-        if(!(Math.abs(newRow)<=1&&Math.abs(newColumn)<=1)){
+        if((Math.abs(newRow)<=1&&Math.abs(newColumn)<=1)){
             return false
         }
         return true
     }
     async function getPlayers():Promise<roomPlayers[]|null>{
-        const {data:gamePlayers,error:gameError}= await supabase.from('game_players').select().eq('game_id',gameLogic().route_id)
+        const {data:gamePlayers,error:gameError}= await supabase.from('game_players').select().eq('game_id',gameLogic().route_id).order('turn_order',{ascending:true})
         
         return gamePlayers
     }
     
     async function resourceDistribution(game_id: string) {
-  const diceRoll = Math.floor(Math.random()*11)+1
+  const diceRoll = Math.floor(Math.random()*11+1)
   if (diceRoll === 7) {
     await loseRandomResources()
     return
@@ -150,12 +149,14 @@ export const gameLoop = defineStore('gameLoop', () => {
     .select()
     .eq('number', diceRoll)
     .eq('game_id', game_id)
+    console.log(tiles)
 
   const { data: settlements,error:errors } = await supabase
     .from('settlements')
     .select()
     .eq('game_id', game_id)
     console.log(errors)
+    console.log(settlements)
 
   for (const tile of tiles || []) {
     for (const settlement of settlements || []) {
@@ -164,13 +165,13 @@ export const gameLoop = defineStore('gameLoop', () => {
         Math.abs(settlement.column - tile.position.column) <= 1
 
       if (!isOnTile) continue
-      const amount = ref<number>(1)
+      let amount = 1
       if (settlement.is_city){
-        amount.value = 2
+        amount = 2
       }
       
 
-      await supabase.rpc('increment', {
+     const {error}= await supabase.rpc('increment', {
         table_name: 'game_players',
         key_field: 'player_id_game',
         row_id: settlement.player_id,
@@ -179,6 +180,7 @@ export const gameLoop = defineStore('gameLoop', () => {
         x: amount,
         field_name: tile.resource
       })
+      console.log(error)
     }
   }
 }
@@ -276,7 +278,8 @@ function isAdjacent(v1: Vertex, v2: Vertex) {
     addSettelement,
     increment,
     getPlayers,
-    BuildRoad
+    BuildRoad,
+    resourceDistribution
     
   }
 })

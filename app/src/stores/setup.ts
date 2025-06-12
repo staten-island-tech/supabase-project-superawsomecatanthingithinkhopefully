@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { type Tiles, type Vertices, type RoomInfo, type roomPlayers } from '@/types/types'
 import type { PostgrestError } from '@supabase/supabase-js'
 import { vertexData } from '@/vertex'
+import { gameLoop } from './gameloop'
 
 export const gameLogic = defineStore('gameLogic', () => {
   const use_rooms = rooms()
@@ -136,12 +137,15 @@ export const gameLogic = defineStore('gameLogic', () => {
       .select()
       .eq('game_id', route_id)
       .order('turn_order', { ascending: true })
-
+    
     const { data } = await supabase
       .from('game')
       .select()
       .eq('id', route_id)
       .single()
+      if(data.round>2){
+        await gameLoop().resourceDistribution(route_id)
+      }
     console.log(selectData?.[data.turn_index])
     if (selectData && data && selectData[data.turn_index]) {
       console.log("WE DID IT????")
@@ -182,7 +186,16 @@ export const gameLogic = defineStore('gameLogic', () => {
     ]
 
     individualTiles.value = []
-    await generateTiles()
+    const { data: userData } = await supabase.auth.getUser()
+const { data: gameData } = await supabase
+  .from('game')
+  .select('user_id')
+  .eq('id', game_id)
+  .single()
+
+if (userData?.user?.id === gameData?.user_id) {
+  await generateTiles()
+}
     await vertexConnection()
 
     const { data: updatedTiles } = await supabase

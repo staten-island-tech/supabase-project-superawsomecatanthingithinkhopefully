@@ -19,15 +19,15 @@
     </div>
     <div>
         <TotalBoard :isTurn="myTurn" v-if="loading === true"/>
+        
         <div v-else>
             <p>im loading gimme a sec</p>
         </div>
         <DeleteButton v-if="isCreator!=null":isCreator="isCreator"  @delete="handleDelete"/>
-    
-        <button @click ="game.turnOrder(id)">if your happy</button>
+        
+        <button v-if="myTurn" @click ="game.turnOrder(id)" :disabled="isInitialPlacementPhase">end turn</button>
     </div>
     
-    <p v-if="game.current_player==use_profile.profile?.id">end turn</p>
 
 </template>
 
@@ -101,6 +101,28 @@ console.log(data)
 initPlayerProfile.value = await use_profile.fetchUserById(use_profile.profile.id)
 console.log(initPlayerProfile.value)
 }}
+const isInitialPlacementPhase = ref<boolean>(true)
+async function checkInitialPlacementStatus() {
+  if (!use_profile.profile?.id || !id.value) return
+
+  const { data, error } = await supabase
+    .from('settlements')
+    .select() 
+    .eq('player_id', use_profile.profile.id)
+    .eq('game_id', id.value)
+
+  if (error) {
+    console.error('Error checking placement status:', error)
+    return
+  }
+    console.log(isInitialPlacementPhase.value)
+
+  if(data.length>2){
+    isInitialPlacementPhase.value=false
+        console.log(isInitialPlacementPhase.value)
+
+  }
+}
 const initPlayerProfile=ref<profileType|null>(null)
 async function handlePlayerResponse(trade: Trade) {
   if (trade && use_profile.profile?.id && id.value) {
@@ -119,6 +141,9 @@ async function handlePlayerResponse(trade: Trade) {
 const myTurn = computed(()=>{
     return use_profile.profile?.id === game.current_player
 })
+const winner = computed(() => {
+  return players.value?.find(player => player.vp >= 10) 
+});
 const initiatorProfiles = ref<profileType[]>([]);
 
 async function loadInitiatorProfiles(trades: Trade[] | null) {
@@ -161,6 +186,7 @@ async function handleBankTrade(selectedBankResource:string,desiredBankResource:s
 
 }
 async function subscriptions(game_id:string){
+  const winnerAlerted = ref<boolean>(false);
         const myChannel= supabase.channel('game_players_resource')
   .on(
     'postgres_changes',
@@ -172,7 +198,22 @@ async function subscriptions(game_id:string){
         console.log("Realtime payload:", payload)
 
         const updatedPlayers = await gameLoop().getPlayers()
-        players.value = updatedPlayers}
+        players.value = updatedPlayers
+      const winner = updatedPlayers?.find((player)=>{
+          return player.vp == 10
+        })
+      if (winner&&!winnerAlerted.value) {
+        alert(`a player has won the game!`)
+        router.push('/dash')
+        winnerAlerted.value = true
+        setTimeout(() => {
+    router.push('/dash');
+  }, 100);
+        await supabase.from('game').delete().eq('id',game_id)
+      }
+      
+      }
+        
   )
   .subscribe()
    const tradeChannel = supabase.channel('game_trades_trades')
@@ -197,14 +238,35 @@ async function subscriptions(game_id:string){
       {
         event: '*',
         schema: 'public',
-        table: 'trades',
-        filter: `game_id=eq.${game_id}`
+        table: 'game',
+        filter: `id=eq.${game_id}`
       },
       async (payload) => {
         console.log("Realtime payload turn", payload)
-// if (payload.new.turn_index !== undefined && players.value.length > 0) {
-//   game.current_player.value = players.value[payload.new.turn_index].player_id_game;
-// }      }
+
+const newPayload = payload.new as { turn_index?: number, [key: string]: any };
+
+if (newPayload.turn_index !== undefined && players.value&& players.value.length > 0) {
+  game.current_player = players.value?.[newPayload.turn_index].player_id_game;
+}
+
+console.log(game.current_player)
+
+const settlementsChannel = supabase
+  .channel('settlement_updates')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'settlements',
+      filter: `player_id=eq.${use_profile.profile?.id}`
+    },
+    async () => {
+      await checkInitialPlacementStatus()
+    }
+  )
+  .subscribe()
 })
     .subscribe()
     }

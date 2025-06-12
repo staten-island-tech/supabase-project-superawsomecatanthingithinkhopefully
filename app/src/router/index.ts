@@ -69,15 +69,15 @@ const router = createRouter({
     },
   ],
 })
-router.beforeEach((to,from) =>{
-  if(!useSignupStore().isLoggedIn && to.name != 'signup' && to.name!='home'){
+// router.beforeEach((to,from) =>{
+//   if(!useSignupStore().isLoggedIn && to.name != 'signup' && to.name!='home'){
     
-    return ({
-      path: '/',
-      query: {redirect: to.fullPath}
-    })
+//     return ({
+//       path: '/',
+//       query: {redirect: to.fullPath}
+//     })
     
-  } 
-  //try to make it so if you copy room link, you must log in then it routes you to room not home page
-})
+//   } 
+//   //try to make it so if you copy room link, you must log in then it routes you to room not home page
+// })
 export default router
