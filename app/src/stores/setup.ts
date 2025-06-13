@@ -131,7 +131,7 @@ export const gameLogic = defineStore('gameLogic', () => {
   }
 
   async function turnOrder(route_id: string) {
-    console.log("WE DID IT ")
+    await supabase.from('trades').delete().eq('game_id',route_id)
     const { data: selectData } = await supabase
       .from('game_players')
       .select()
@@ -143,20 +143,18 @@ export const gameLogic = defineStore('gameLogic', () => {
       .select()
       .eq('id', route_id)
       .single()
-      if(data.round>2){
-        await gameLoop().resourceDistribution(route_id)
-      }
-    console.log(selectData?.[data.turn_index])
+      
     if (selectData && data && selectData[data.turn_index]) {
-      console.log("WE DID IT????")
       current_player.value = selectData[data.turn_index].player_id_game
     }
-    console.log(current_player.value)
-    if (data) {
+   if (data) {
       if (data.turn_index + 1 >= data.number_player) {
         data.turn_index = 0
-        data.round += 1
-      } else {
+        data.round += 1}
+      if(data.round>=1){
+        await gameLoop().resourceDistribution(route_id)
+      }
+       else {
         data.turn_index += 1
       }
 

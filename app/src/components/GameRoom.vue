@@ -94,7 +94,6 @@ const host_username = ref()
 
 
 async function handleDeletion() {
-  console.log(room_id)
   await use_rooms.deleteRoom(room_id)
 
   routers.push({ path: '/dash' })
@@ -107,7 +106,6 @@ async function startGame() {
     .eq('game_id', room_id)
 
   if (error) {
-    console.error('Error starting game:', error)
   }
 }
 const tl = gsap.timeline()
@@ -120,14 +118,11 @@ onMounted(async () => {
 
   const result = await use_profile.fetchUserProfile()
   auth.value = result.user
-  console.log(result, 'result')
-  console.log(auth.value, 'auth.value')
-  console.log("id",auth.value?.id)
+  
   
   
 
   const host = await gameStore.get_host()
-  console.log(host?.value)
   host_username.value = host
 
   //const { data, error } = await supabase.from('game_players').insert({ game_id: room_id }).select()
@@ -190,7 +185,6 @@ onMounted(async () => {
     'postgres_changes',
     { event: '*', schema: 'public', table: 'game_players', filter: `game_id=eq.${room_id}` },
     async (payload) => {
-      console.log('New player joined:', payload)
 
       
       const { data: gamePlayers } = await supabase
@@ -237,7 +231,6 @@ onMounted(async () => {
       (payload) => {
         
         const newData = payload.new
-        console.log(newData, 'pushing')
         if (newData.game_started) {
           routers.push({ path: `/${room_id}` })
         }

@@ -23,7 +23,7 @@ export const gameLoop = defineStore('gameLoop', () => {
   x: increment_value,
   field_name: resource
     })
-  console.log(error)}
+  }
   async function upgradeCity(userId:string,gameId:string){
     await increment('wheat',-2,userId,gameId)
     await increment('ore',-3,userId,gameId)
@@ -53,7 +53,6 @@ export const gameLoop = defineStore('gameLoop', () => {
     .from('settlements')
     .select()
     .eq('game_id', game_id)
-    console.log(error)
 
   const { data: playerRoads } = await supabase
     .from('roads')
@@ -77,7 +76,6 @@ export const gameLoop = defineStore('gameLoop', () => {
     )
     if (check === false) return false
     if (check === 'upgrade' && settlement.player_id === userId) {
-      console.log('hey')
       if (currentPlayer.wheat >= 2 && currentPlayer.ore >= 3) {
         await upgradeCity(userId, game_id)
         await supabase
@@ -109,7 +107,6 @@ export const gameLoop = defineStore('gameLoop', () => {
       is_city: false
       
     })
-    console.log(error)
     await buySettlement(userId, game_id)
   }
 
@@ -138,7 +135,8 @@ export const gameLoop = defineStore('gameLoop', () => {
     }
     
     async function resourceDistribution(game_id: string) {
-  const diceRoll = Math.floor(Math.random()*11+1)
+      console.log("YABAADE")
+  const diceRoll = Math.floor(Math.random()*11)+1
   if (diceRoll === 7) {
     await loseRandomResources()
     return
@@ -149,21 +147,19 @@ export const gameLoop = defineStore('gameLoop', () => {
     .select()
     .eq('number', diceRoll)
     .eq('game_id', game_id)
-    console.log(tiles)
 
   const { data: settlements,error:errors } = await supabase
     .from('settlements')
     .select()
     .eq('game_id', game_id)
-    console.log(errors)
-    console.log(settlements)
+    
 
   for (const tile of tiles || []) {
     for (const settlement of settlements || []) {
       const isOnTile =
         Math.abs(settlement.row - tile.position.row) <= 1 &&
         Math.abs(settlement.column - tile.position.column) <= 1
-
+      console.log(isOnTile)
       if (!isOnTile) continue
       let amount = 1
       if (settlement.is_city){
@@ -209,7 +205,6 @@ const total = resourceKeys.reduce((sum, key) => sum + (player[key] || 0), 0)
   sheep: player.sheep,
 }
   await supabase.from('game_players').update(updatedResources).eq('player_id_game',player.player_id_game)
-  console.log(player)
 }
   
   
@@ -229,13 +224,11 @@ function isAdjacent(v1: Vertex, v2: Vertex) {
   );
 }
   async function BuildRoad(userId:string,gameId:string,playerRoads:road[],newRoad:road,playerSettlements:Vertex[]){
-    console.log("attempted road =",newRoad)
     const {data:playerData,error}=await supabase.from('game_players').select().eq('player_id_game',userId).eq('game_id',gameId).single()
 
     const connectedSettlement = playerSettlements.some((settlement)=>{
        return (newRoad.from.row == settlement.row && newRoad.from.column == settlement.column) || (newRoad.to.row == settlement.row&&newRoad.to.column == settlement.column)
     })
-    console.log(connectedSettlement)
     const connectedRoad = playerRoads.some((road) => {
   return (
     (road.from.row === newRoad.from.row && road.from.column === newRoad.from.column) ||
@@ -244,7 +237,6 @@ function isAdjacent(v1: Vertex, v2: Vertex) {
     (road.to.row === newRoad.to.row && road.to.column === newRoad.to.column)
   )
 })
-console.log(connectedRoad)
 
     const roadExists = playerRoads.some(road =>
   ((road.from.row === newRoad.from.row && road.from.column === newRoad.from.column) &&
@@ -253,9 +245,7 @@ console.log(connectedRoad)
   ((road.from.row === newRoad.to.row && road.from.column === newRoad.to.column) &&
    (road.to.row === newRoad.from.row && road.to.column === newRoad.from.column))
 );
-console.log(playerData,error)
-    if ((connectedRoad || connectedSettlement) && !roadExists){
-      console.log(true)
+    if ((connectedRoad || connectedSettlement) && !roadExists&&playerData.wood>=1&&playerData.brick>=1){
       const { data, error } = await supabase
   .from('roads')
   .insert({
@@ -265,8 +255,7 @@ console.log(playerData,error)
     to: newRoad.to,      
     color:playerData.color
   }).select();
-  console.log(data)
-  console.log(error)
+  
   await buyRoad(userId,gameId)
   return true
     }

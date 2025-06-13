@@ -47,7 +47,6 @@ export const rooms = defineStore('rooms', () => {
   async function fetchRooms(){
     const {data,error} = await supabase.from('game').select('*')
     if (!data|| error){
-      console.log(":(")
     }
     else{
       // console.log(data)
@@ -59,17 +58,14 @@ export const rooms = defineStore('rooms', () => {
   async function deleteRoom(id:string){
    
     const {data:deleted_room,error:deleted_error} = await supabase.from('game').delete().eq('id',id)
-    console.log(deleted_error)
   }
   async function joinRoom(id:string,push:boolean){
     const {data:userData,error:userError} = await supabase.auth.getUser()
     if(userData.user){
           const {data:lengthPlayers,error:lengthError} = await supabase.from('game_players').select().eq('player_id_game',userData.user.id).eq('game_id',id)
       if(lengthPlayers&&lengthPlayers.length>0){
-        console.log(lengthError)
       }
       else{
-        console.log("...")
         const { data, error } = await supabase
   .from('game_players')
   .insert({
@@ -88,7 +84,6 @@ export const rooms = defineStore('rooms', () => {
     }
   async function fetchRoomCreator(room_id:string,user_id:string|undefined){
     const {data,error} = await supabase.from('game').select().eq('id',room_id).single()
-    console.log(data.user_id)
     isCreator.value = data.user_id === user_id
     return isCreator.value
   }
