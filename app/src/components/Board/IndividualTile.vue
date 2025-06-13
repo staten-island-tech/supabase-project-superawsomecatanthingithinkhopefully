@@ -8,7 +8,8 @@
     ]"
   >
     <div class="grid grid-cols-2 grid-rows-2 w-full h-full gap-1 p-2">
-      
+      <p>{{ tile.number }}</p>
+      <p>{{ tile.resource }}</p>
       <div v-for="(vertex, index) in tile.vertex" :key="index">
         <div v-if="settlementsAtVertices?.[index].hasSettlement && !settlementsAtVertices[index].isCity">
           <button @click="$emit('settle', vertex)">y</button>
@@ -28,6 +29,7 @@
           >
             Build
           </button>
+          
         </div>
       </div>
     </div>

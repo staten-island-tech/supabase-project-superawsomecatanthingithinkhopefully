@@ -17,11 +17,9 @@ export const gamers = defineStore('gameStore', () => {
         const {data:Hostdata, error}: {data: Hosttype[] | null, error: PostgrestError|null} = await supabase.from('game').select('user_id, id').eq('id', room_id)
         if (Hostdata){
             room_host.value = Hostdata[0].user_id
-            console.log(room_host)
             const {data, error}: {data: Name_TagType[] | null, error: PostgrestError | null} = await supabase.from('profiles').select('username, id').eq('id', room_host.value)
             if (data){
                 room_host.value = data[0].username
-                console.log(room_host.value)
                 
                 return room_host
             }
