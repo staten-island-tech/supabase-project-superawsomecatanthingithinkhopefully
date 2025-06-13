@@ -135,7 +135,7 @@ const roadStates = computed(() => {
         
         isBuilt = true;  
         roadColor = existingRoad.color;  
-        roadColor = tailwindRoadColor[existingRoad.color] || 'bg-gray-400';
+        // roadColor = tailwindRoadColor[existingRoad.color] || 'bg-gray-400';
         break;  
       }
     }
