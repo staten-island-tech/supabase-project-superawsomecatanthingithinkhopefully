@@ -36,7 +36,7 @@
             :class="getPlayerColorClass(players.color)"
             >
               <div class="w-[5vw] rounded-full">
-                <img class="rounded-full" src="/profile_temp.jpg" alt="profile_pic" />
+                <img class="rounded-full" :src="profilePics[players.username]" alt="profile_pic" />
               </div>
               <h2 v-if="!gameStore.room_host">Loading...</h2>
               <h1 class="truncate text-3xl color-white-500" v-else>
@@ -87,11 +87,12 @@ const router = useRoute()
 const routers = useRouter()
 const gameStore = gamers()
 const use_rooms = rooms()
+
 const room_id = router.params.gameid as string
 
 const host_username = ref()
 
-
+const profile = ref()
 
 async function handleDeletion() {
   await use_rooms.deleteRoom(room_id)
@@ -111,6 +112,8 @@ async function startGame() {
 const tl = gsap.timeline()
 const use_profile = profileStore()
 const auth = ref<User | null>(null)
+
+const profilePics = reactive<Record<string, string>>({})
 
 const newids = ref()
 onMounted(async () => {
@@ -169,6 +172,24 @@ onMounted(async () => {
     .select('id, username')
     .in('id', ids)
 
+  if (usernames) {
+    for (const user of usernames) {
+      const { data: pic } = await supabase
+        .from('profiles')
+        .select('profile_pic')
+        .eq('username', user.username)
+        .single()
+
+      if (pic?.profile_pic) {
+        profilePics[user.username] = pic.profile_pic
+
+        const {error} = await supabase.from('game_players').update({profile_pic: pic.profile_pic}).eq('username', user.username)
+      }
+    }
+  }
+
+
+  
   // players.value = usernames?.map(user => {
   //   const match = data?.find(p => p.player_id_game === user.id)
   //   return {
@@ -281,6 +302,16 @@ onMounted(async () => {
   //   console.log(room_link.value)
   // }
 })
+
+
+async function correct_photo(username){
+  const {data: pic} = await supabase.from('profiles').select('profile_pic').eq('username',username )
+  
+  profile.value = pic
+  console.log(profile.value[0].profile_pic, 'profile.value', username)
+  return profile.value[0].profile_pic
+}
+
 
 let purple = ref<boolean>(true)
 let currentcolor = ref(purple)
