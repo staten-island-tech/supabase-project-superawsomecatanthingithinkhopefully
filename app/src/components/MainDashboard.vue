@@ -112,7 +112,6 @@ onMounted(async ()=>{
   
   const {data:pic, error} = await supabase.from('profiles').select('profile_pic').eq('id', data.value?.id).single()
   profile_picture.value = pic?.profile_pic
-  console.log(profile_picture.value)
 })
 
 

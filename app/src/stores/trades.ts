@@ -43,8 +43,7 @@ export const tradeStore = defineStore('trades', () => {
     .eq('game_id',gameId)
     .single()
     
-    console.log(initError)
-    console.log("ts is init",initPlayer)
+    
     const { data: recievePlayer, error:reciever } = await supabase
     .from('game_players')
     .select()
@@ -53,29 +52,39 @@ export const tradeStore = defineStore('trades', () => {
     .single()
 
     
-    console.log("ts is recieve",recievePlayer,reciever)
     if (initPlayer[typeInitResource]>=initResource && recievePlayer[typeRecieveResource] >= recieveResource){
         await gameLoop().increment(typeInitResource,-initResource,initiatingPlayer,gameId)
         await gameLoop().increment(typeRecieveResource,recieveResource,initiatingPlayer,gameId)
 
         await gameLoop().increment(typeInitResource,initResource,recievingPlayer,gameId)
         await gameLoop().increment(typeRecieveResource,-recieveResource,recievingPlayer,gameId)
+      
+    console.log("yes!")
     }
+    const {data,error}=   await supabase
+    .from('trades')
+    .delete()
+    .eq('init_id', initiatingPlayer)
+    .eq('init_type', typeInitResource)
+    .eq('init_quant', initResource)
+    .eq('recieve_type', typeRecieveResource)
+    .eq('recieve_quant', recieveResource)
+    .eq('game_id', gameId);
+        console.log(error)
+
     
     }
     async function offerTrade(initiatingPlayer:string,initResource:number,typeInitResource:string,recieveResource:number,typeRecieveResource:string,gameId:string){
          
         
         const {data,error} = await supabase.from('trades').insert({init_id:initiatingPlayer,init_type:typeInitResource,init_quant:initResource,recieve_type:typeRecieveResource,recieve_quant:recieveResource,game_id:gameId}).select().single()
-    console.log(error)
         if(data&&!error){
         return data
     }
     }
     async function fetchTradeResults(gameId:string){
         const {data,error}:{data:Trade[]|null,error:PostgrestError|null} = await supabase.from('trades').select().eq('game_id',gameId)
-        console.log(data)
-        console.log(error)
+        
         return data
     }
     

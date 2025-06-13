@@ -69,7 +69,6 @@ onMounted(async()=>{
     trades.value = await tradeStore().fetchTradeResults(id.value)
     await loadInitiatorProfiles(trades.value);
     isCreator.value = await rooms().fetchRoomCreator(id.value,use_profile.profile?.id)
-    console.log("this is gam baord")
     const {data}=await supabase.from('roads').select().eq('game_id',id.value)
     if(data){
       builtRoads.value = data
@@ -78,7 +77,6 @@ onMounted(async()=>{
 if(settlementData){
       builtSettlements.value = settlementData
     }
-    console.log(use_profile.profile?.id === game.current_player)
     loading.value = true
 })
 const tradeData = ref<Trade|null>(null)
@@ -90,7 +88,6 @@ if (
 )
 
     {
-        console.log(1)
         const data =await tradeStore().offerTrade(
   profileStore().profile?.id as string,
   selectedPlayerQuantity,  
@@ -102,9 +99,7 @@ if (
   id.value
 ) 
 tradeData.value = data
-console.log(data)
 initPlayerProfile.value = await use_profile.fetchUserById(use_profile.profile.id)
-console.log(initPlayerProfile.value)
 }}
 const isInitialPlacementPhase = ref<boolean>(true)
 async function checkInitialPlacementStatus() {
@@ -115,14 +110,14 @@ async function checkInitialPlacementStatus() {
     .select() 
     .eq('player_id', use_profile.profile.id)
     .eq('game_id', id.value)
-
+console.log("This is what im looking ofr",data)
   if (error) {
     console.error('Error checking placement status:', error)
     return
   }
     console.log(isInitialPlacementPhase.value)
 
-  if(data.length>2){
+  if(data.length>=2){
     isInitialPlacementPhase.value=false
         console.log(isInitialPlacementPhase.value)
 
@@ -172,9 +167,17 @@ async function buildRoad(road:road){
   roadBuilt.value = false
   console.log(road)
 const {data,error}:{data:road[]|null,error:PostgrestError|null} =await supabase.from('roads').select().eq('player_id',use_profile.profile?.id).eq('game_id',id.value)
+
+await checkInitialPlacementStatus()
+console.log(isInitialPlacementPhase)
+if(isInitialPlacementPhase.value&&data&&data?.length>=2){
+  alert('Only two roads for now buddy')
+  return
+}
 const { data: settlementData,error:settlememt } = await supabase.from('settlements').select().eq('game_id', id.value).eq('player_id',use_profile.profile?.id)
 console.log('this is y settlement data',settlementData)
 console.log(settlememt)
+await checkInitialPlacementStatus()
 if(use_profile.profile?.id&&data&&settlementData){
   const check = await gameLoop().BuildRoad(use_profile.profile?.id,id.value,data,road,settlementData)
 if (check){
@@ -228,6 +231,28 @@ async function subscriptions(game_id:string){
         
   )
   .subscribe()
+  const deleteChannel = supabase.channel('trade_deletes_only')
+
+deleteChannel
+  .on(
+    'postgres_changes',
+    {
+      event: 'DELETE',
+      schema: 'public',
+      table: 'trades'
+    },
+    async (payload) => {
+  console.log(payload.eventType)
+
+
+  if (payload.eventType === 'DELETE') {
+    trades.value = await tradeStore().fetchTradeResults(game_id)
+    await loadInitiatorProfiles(trades.value)
+  }
+}
+  )
+  .subscribe()
+
    const tradeChannel = supabase.channel('game_trades_trades')
     .on(
       'postgres_changes',
@@ -239,7 +264,11 @@ async function subscriptions(game_id:string){
       },
       async (payload) => {
         console.log("Realtime payload (trades):", payload)
-        trades.value = await tradeStore().fetchTradeResults(game_id)
+        console.log(payload.eventType)
+          
+      trades.value = await tradeStore().fetchTradeResults(game_id)
+    
+        console.log(trades.value)
         await loadInitiatorProfiles(trades.value);
       }
     )
@@ -256,7 +285,7 @@ async function subscriptions(game_id:string){
       async (payload) => {
         console.log("Realtime payload turn", payload)
 
-const newPayload = payload.new as { turn_index?: number, [key: string]: any };
+const newPayload = payload.new as { turn_index?: number, [key: string]:any };
 
 if (newPayload.turn_index !== undefined && players.value&& players.value.length > 0) {
   game.current_player = players.value?.[newPayload.turn_index].player_id_game;
@@ -280,6 +309,7 @@ console.log(game.current_player)
     async (payload) => {
       console.log("ts is settlements",payload)
       await checkInitialPlacementStatus()
+      console.log(isInitialPlacementPhase)
       const newSettlement = payload.new as Settlement
       console.log("HEY BOZO THIS IS THE THING")
       console.log(newSettlement)
