@@ -9,7 +9,6 @@
 <script setup lang="ts">
 import type { profileType } from '@/types/types';
 import { ref } from 'vue';
-console.log("IM IN THE COMP")
 const props = defineProps<{
     user:profileType|null
     recieve: {quantity:number,type:string}

@@ -15,7 +15,7 @@
         {{ players }}
     </div>
     <div>
-        <TotalBoard :isTurn="myTurn" v-if="loading === true" @buildRoad="buildRoad" />
+        <TotalBoard :isTurn="myTurn" v-if="loading === true" :builtRoads="builtRoads" @buildRoad="buildRoad" :settlements="builtSettlements" />
         
         <div v-else>
             <p>im loading gimme a sec</p>
@@ -41,12 +41,11 @@ import { useRoute,useRouter } from 'vue-router';
 import { gameLogic } from '@/stores/setup';
 import { gameLoop } from '@/stores/gameloop';
 import { tradeStore } from '@/stores/trades';
-import { type profileType, type road, type roomPlayers, type Trade } from '@/types/types';
+import { type playerRoad, type profileType, type road, type roomPlayers, type Settlement, type Trade } from '@/types/types';
 import TradeRequest from '@/components/Trades/TradeRequest.vue';
 import TradeResponse from '@/components/Trades/TradeResponse.vue';
 import UserProfile from '@/components/UserProfile.vue';
 import type { PostgrestError } from '@supabase/supabase-js';
-import RoadLogic from '@/components/Board/RoadLogic.vue';
 import { roads } from '@/vertex';
 const game = gameLogic()
 const use_profile=profileStore()
@@ -55,7 +54,8 @@ const isCreator = ref<boolean|null>(null)
 const id = ref<string>('')
 const players =ref<roomPlayers[]|null>(null)
 const trades = ref<Trade[]|null>()
-
+const builtRoads = ref<playerRoad[]>([])
+const builtSettlements = ref<Settlement[]>([])
 
 const router=useRouter()
 onMounted(async()=>{
@@ -70,7 +70,15 @@ onMounted(async()=>{
     await loadInitiatorProfiles(trades.value);
     isCreator.value = await rooms().fetchRoomCreator(id.value,use_profile.profile?.id)
     console.log("this is gam baord")
-console.log(use_profile.profile?.id === game.current_player)
+    const {data}=await supabase.from('roads').select().eq('game_id',id.value)
+    if(data){
+      builtRoads.value = data
+    }
+    const {data:settlementData} = await supabase.from('settlements').select().eq('game_id',id.value)
+if(settlementData){
+      builtSettlements.value = settlementData
+    }
+    console.log(use_profile.profile?.id === game.current_player)
     loading.value = true
 })
 const tradeData = ref<Trade|null>(null)
@@ -159,16 +167,22 @@ const exists = initiatorProfiles.value.find(p => p.id === trade.init_id);
 function findProfileById(id: string): profileType | null {
   return initiatorProfiles.value.find(p => p.id === id) ?? null
 }
+const roadBuilt = ref<boolean>(false)
 async function buildRoad(road:road){
+  roadBuilt.value = false
   console.log(road)
-const {data,error}:{data:road[]|null,error:PostgrestError|null} =await supabase.from('roads').select().eq('player_id',use_profile.profile?.id)
+const {data,error}:{data:road[]|null,error:PostgrestError|null} =await supabase.from('roads').select().eq('player_id',use_profile.profile?.id).eq('game_id',id.value)
 const { data: settlementData,error:settlememt } = await supabase.from('settlements').select().eq('game_id', id.value).eq('player_id',use_profile.profile?.id)
-console.log(use_profile.profile?.id)
+console.log('this is y settlement data',settlementData)
 console.log(settlememt)
 if(use_profile.profile?.id&&data&&settlementData){
-  await gameLoop().BuildRoad(use_profile.profile?.id,id.value,data,road,settlementData)
-
+  const check = await gameLoop().BuildRoad(use_profile.profile?.id,id.value,data,road,settlementData)
+if (check){
+  roadBuilt.value = true
 }
+console.log(roadBuilt.value)
+}
+console.log(builtRoads.value)
 }
 
 async function handleDelete(){
@@ -250,7 +264,10 @@ if (newPayload.turn_index !== undefined && players.value&& players.value.length 
 
 console.log(game.current_player)
 
-const settlementsChannel = supabase
+
+})
+    .subscribe()
+    const settlementsChannel = supabase
   .channel('settlement_updates')
   .on(
     'postgres_changes',
@@ -258,15 +275,48 @@ const settlementsChannel = supabase
       event: '*',
       schema: 'public',
       table: 'settlements',
-      filter: `player_id=eq.${use_profile.profile?.id}`
+      filter: `game_id=eq.${id.value}`
     },
-    async () => {
+    async (payload) => {
+      console.log("ts is settlements",payload)
       await checkInitialPlacementStatus()
+      const newSettlement = payload.new as Settlement
+      console.log("HEY BOZO THIS IS THE THING")
+      console.log(newSettlement)
+      if (newSettlement.is_city) {
+        builtSettlements.value = builtSettlements.value.filter(
+          (settlement) =>
+            (settlement.id === newSettlement.id&&!newSettlement.is_city) 
+        );
+      }
+
+      builtSettlements.value.push(newSettlement);
+
+      console.log(builtSettlements.value)
     }
   )
   .subscribe()
-})
-    .subscribe()
+    const roadChannel= supabase.channel('roadChannel')
+  .on(
+    'postgres_changes',
+    { event: '*' ,
+    schema:'public',
+    table:'roads',
+    filter:`game_id=eq.${game_id}`},
+    async (payload) => {
+        console.log("Realtime payload: roads edition", payload)
+
+builtRoads.value.push(payload.new as playerRoad)
+        console.log(builtRoads.value)
+      
+    
+        
+      }
+      
+      
+        
+  )
+  .subscribe()
     }
 </script>
 

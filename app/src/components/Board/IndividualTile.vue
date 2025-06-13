@@ -7,43 +7,50 @@
       'settled-settlement'
     ]"
   >
-    <!-- Vertex buttons grid -->
     <div class="grid grid-cols-2 grid-rows-2 w-full h-full gap-1 p-2">
-      <button
-        v-for="(vertex, index) in tile.vertex"
-        :key="index"
-        @click="$emit('settle', vertex)"
-        :disabled="!isTurn"
-        :class="[
-          'w-full h-full rounded-lg transition-all duration-300',
-          tileColor.base,
-          tileColor.hover,
-          'disabled:opacity-50 hover:scale-105',
-          'pop-animation',
-          'settled-settlement'
-        ]"
-      >
-        yes
-      </button>
+      
+      <div v-for="(vertex, index) in tile.vertex" :key="index">
+        <div v-if="settlementsAtVertices?.[index].hasSettlement && !settlementsAtVertices[index].isCity">
+          <button @click="$emit('settle', vertex)">y</button>
+
+        </div>
+        
+        <div v-else-if="settlementsAtVertices?.[index].hasSettlement && settlementsAtVertices[index].isCity">
+          <p>City here!</p>
+        </div>
+
+        <div v-else>
+          <button
+            @click="$emit('settle', vertex)"
+            :disabled="!isTurn"
+            class="w-full h-full rounded-lg transition-all duration-300"
+            :class="[tileColor.base, tileColor.hover, 'disabled:opacity-50 hover:scale-105']"
+          >
+            Build
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Road buttons on edges -->
-    <button
-      v-for="(road, idx) in roadButtons"
-      :key="'road-' + idx"
-      class="road-btn"
-      :class="road.position"
-      @click="$emit('buildRoad',road),console.log(road)"
-      :disabled="!isTurn"
-    >
-      buildr oad
-    </button>
+    <div v-for="(road, idx) in roadStates" :key="'road-' + idx">
+      <div v-if="road.isBuilt">
+        <div
+          class="absolute w-6 h-1 rounded-full"
+          :class="[road.position, road.color]"
+        >
+          <p :class="['road-text', road.color]">hello i am road {{ road.color }}</p>
+        </div>
+      </div>
 
-    <!-- Center text showing resource info -->
-    <div class="absolute inset-0 flex items-center justify-center pointer-events-none px-1">
-      <span class="font-semibold text-xs sm:text-sm text-center text-white drop-shadow-lg truncate">
-        {{ tile.resource }} — {{ tile.number }}
-      </span>
+      <button
+        v-else
+        class="road-btn"
+        :class="road.position"
+        @click="$emit('buildRoad', road)"
+        :disabled="!isTurn"
+      >
+        Build road
+      </button>
     </div>
   </div>
 </template>
@@ -51,14 +58,17 @@
 
 
 
+
 <script setup lang="ts">
 import VertexButton from "@/components/Board/VertexButton.vue"
-import type { Tiles, Vertices } from '@/types/types';
+import type { playerRoad, road, Settlement, Tiles, Vertices,Vertex } from '@/types/types';
 import { computed } from 'vue';
 const emit = defineEmits(['buildRoad','settle'])
 const props = defineProps<{
     tile: Tiles;
     isTurn: boolean;
+    builtRoads:playerRoad[]
+    settlements:Settlement[]
 }>();
 
 
@@ -81,12 +91,10 @@ const tileColor = computed(() => {
   }
 });
 
-// Assuming tile.vertex is an array of 4 vertices in this order:
-// 0 = top-left, 1 = top-right, 2 = bottom-left, 3 = bottom-right
+
 
 const roadButtons = computed(() => {
-  if (!props.tile.vertex || props.tile.vertex.length < 4) {
-    // Defensive fallback — no vertices means no roads
+  if (!props.tile.vertex) {
     return [];
   }
 
@@ -97,6 +105,66 @@ const roadButtons = computed(() => {
     { position: 'road-left', from: props.tile.vertex[0], to: props.tile.vertex[2] },
   ];
 });
+const roadStates = computed(() => {
+  return roadButtons.value.map(road => {
+    let isBuilt = false;   
+    let roadColor = 'bg-gray-400';  
+
+    
+    for (let i = 0; i < props.builtRoads.length; i++) {
+      const existingRoad = props.builtRoads[i];
+
+      if (existingRoad.from.row === road.from.row && existingRoad.from.column === road.from.column &&
+          existingRoad.to.row === road.to.row && existingRoad.to.column === road.to.column) {
+        
+        isBuilt = true;  
+        roadColor = existingRoad.color;  
+        break;  
+      }
+    }
+
+    
+    return {
+      from: road.from,
+      to: road.to,
+      position: road.position,
+      isBuilt: isBuilt,
+      color: roadColor
+    };
+  });
+});
+
+
+const settlementsAtVertices = computed(() => {
+  const result = [];  
+
+  if (props.tile.vertex) {
+    for (let i = 0; i < props.tile.vertex.length; i++) {
+      const vertex = props.tile.vertex[i];
+
+      let settlement = null;
+
+      for (let j = 0; j < props.settlements.length; j++) {
+        const existingSettlement = props.settlements[j];
+        
+        if (existingSettlement.row === vertex?.row && existingSettlement?.column === vertex?.column) {
+          settlement = existingSettlement; 
+          break; 
+        }
+      }
+      result.push({
+        vertex,
+        hasSettlement: !!settlement, 
+        isCity: settlement?.is_city || false 
+      });
+    }
+  }
+
+  return result;  
+});
+
+
+
 
 </script>
 

@@ -34,7 +34,6 @@ export interface Tiles{
   quantity?:number
   number:number|null
   position?:{row:number,column:number}
-  settlements?:string[]
   vertex?:{row:number,column:number}[]
 }
 
@@ -72,8 +71,11 @@ export interface road{
 }
 export interface Settlement{
   player_id:string,
-  position:{row:number,column:number},
-  isCity:boolean
+  row:number
+  column:number
+  is_city:boolean,
+  color:string,
+  id?:string
 }
 export interface Trade {
   id: string            
@@ -94,6 +96,13 @@ export interface GamePlayer{
   game_id: string
   player_id_game: string
   color: string | null
+}
+export interface playerRoad {
+  position:string
+  from:Vertex
+  to:Vertex
+  player_id:string
+  color:string
 }
 
 

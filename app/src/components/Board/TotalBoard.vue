@@ -7,8 +7,10 @@
       :key="index"
       :tile="tile"
       :isTurn="isTurn"
+      :builtRoads="builtRoads"
+      :settlements="settlements"
       @settle="handleSettle"
-      @buildRoad="$emit('buildRoad',$event),console.log($event)"
+      @buildRoad="$emit('buildRoad',$event)"
       
     />
     
@@ -29,6 +31,7 @@ import { gameLoop } from '@/stores/gameloop';
 import { computed, onMounted,ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { profileStore } from '@/stores/profile';
+import type { playerRoad, Settlement } from '@/types/types';
 const game = gameLogic()
 const use_profile = profileStore()
 
@@ -36,13 +39,14 @@ async function handleSettle(tile:{row:number,column:number}){
     await gameLoop().addSettelement(tile)
 }
 const props =defineProps<{
-    isTurn:boolean
+    isTurn:boolean;
+    builtRoads:playerRoad[];
+    settlements:Settlement[]
 }>()
 
 
 
 
-console.log(2)
 </script>
 
 <style scoped>
