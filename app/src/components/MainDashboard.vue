@@ -46,7 +46,6 @@
           </div>
           
           <div v-if="fetched_data&&fetched_data.length==0">
-            <p>No Rooms currently. Make one</p>
           </div>
 
           <div class="create_box glass absolute bottom-20 left-0 w-100 h-125">
