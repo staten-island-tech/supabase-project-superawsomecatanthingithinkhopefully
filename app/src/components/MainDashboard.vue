@@ -4,15 +4,17 @@
       <div ref="imageLayer" class="background image-layer"></div> -->
       <div class="content">
         <div class="static">
-
-          <div v-if="profile_picture" class="avatar absolute top-5 right-5">
+          
+          <div v-if="profile_picture" class=" avatar absolute top-5 right-5">
             <div class="w-24 rounded-full">
               <RouterLink to="/AccountStuff"><img :src="profile_picture" alt="profile_pic"/></RouterLink>
-              
-            </div>
             
+            </div>
+          
           </div>
-          <div class="absolute top-30 right-5">
+          
+          
+          <div class="name absolute top-30 right-5">
             <h2 v-if="data">{{data.username}}</h2>
           </div>
           
@@ -24,21 +26,29 @@
           </div>
 
           
-          <div v-if="fetched_data && fetched_data.length > 0" class="join_buttons flex flex-col items-center mt-10 space-y-6">
-            <div 
-              v-for="room in fetched_data" 
-              :key="room.id"
-              class="bg-violet-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full cursor-pointer w-fit"
-              @click="use_rooms.joinRoom(room.id, true)"
+          <div v-if="fetched_data && fetched_data.length > 0" class="join_dropdown mt-10 flex justify-center relative top-[10vw] left-[5vw]">
+            <select
+              v-model="selectedRoomId"
+              @change="joinSelectedRoom"
+              class="p-2 rounded bg-violet-600 text-white font-bold cursor-pointer hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              Join Room {{ room.id }}
-            </div>
+              <option disabled value="">Select a room to join</option>
+              <option
+                v-for="room in fetched_data"
+                :key="room.id"
+                :value="room.id"
+                class="bg-violet-600 text-white"
+              >
+                Join Room {{ room.id }}
+              </option>
+            </select>
           </div>
+          
           <div v-if="fetched_data&&fetched_data.length==0">
             <p>No Rooms currently. Make one</p>
           </div>
 
-          <div class="glass absolute bottom-20 left-0 w-100 h-125">
+          <div class="create_box glass absolute bottom-20 left-0 w-100 h-125">
             <h2 class="absolute bottom-110 left-30 text-2xl font-bold underline">Create Room</h2>
 
             <form @submit.prevent="handleRoom">
@@ -55,6 +65,7 @@
             </form>
 
           </div>
+        </div>
       </div>
 
     
@@ -77,9 +88,22 @@ import routers from '@/router'
 import { onMounted,ref } from 'vue'
 import { supabase } from '@/lib/supabaseClient'
 import type { PostgrestError } from '@supabase/supabase-js'
+import { nextTick } from 'vue'
+
+
+
+const selectedRoomId = ref('')
+
+function joinSelectedRoom() {
+  if (selectedRoomId.value) {
+    use_rooms.joinRoom(selectedRoomId.value, true)
+    selectedRoomId.value = ''
+  }
+}
+
 
 const container = ref<HTMLElement | null>(null)
-const imageLayer = ref<HTMLElement | null>(null)
+
 
 function handleMouseMove(event: MouseEvent) {
   const { innerWidth } = window
@@ -95,7 +119,7 @@ function handleMouseMove(event: MouseEvent) {
     duration: 0.3,
     ease: 'power2.out',
   })
-  gsap.to('.join_buttons', {
+  gsap.to('.join_dropdown', {
     opacity: proximityToLeft,
     duration: 0.3,
     ease: 'power2.out',
@@ -117,7 +141,11 @@ async function handleRoom() {
 }
 const fetched_data = ref<RoomInfo[]|undefined>([])
 const data = ref<profileType|null>(null)
+const tl = gsap.timeline()
 onMounted(async ()=>{
+  tl.set('.name', {opacity: 0, y: '100vw'})
+  tl.set('.create_box', {opacity: 0, y: '100vw'})
+
   const user_info = await use_user.fetchUserData()
   const room_data = await use_rooms.fetchRooms()
   fetched_data.value = room_data
@@ -126,6 +154,18 @@ onMounted(async ()=>{
   const {data:pic, error} = await supabase.from('profiles').select('profile_pic').eq('id', data.value?.id).single()
   profile_picture.value = pic?.profile_pic
   console.log(profile_picture.value)
+
+  await nextTick()
+  
+  tl.set('.avatar', {opacity: 0, y: '100vw'})
+    
+
+
+
+  tl.to('.create_box', {opacity: 1, y: 0, duration: 1.5, ease: 'power2.out'})
+    .to('.avatar', {opacity: 1, y: 0, duration: 1.5, ease: 'power2.out'}, '-=0.75')
+    .to('.name', {opacity: 1, y: 0, duration: 1.5, ease: 'power2.out'}, '-=1')
+
 })
 
 
