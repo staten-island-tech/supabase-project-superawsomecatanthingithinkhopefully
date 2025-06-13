@@ -1,46 +1,54 @@
 <template>
-  <div data-theme="synthwave" class="static min-h-screen" >
+  <div data-theme="synthwave" class="static min-h-screen relative flex flex-col" >
     <div class="absolute top-0 right-0 z-20">
-      <button v-if="hide_trades" @click="toggle_trades()">Hide Trade Menu</button>
+      <button v-if="hide_trades" @click="toggle_trades()" class="bg-purple-400 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-full">Hide Trade Menu</button>
       <BankTrade v-if="hide_trades" @trade = "handleBankTrade"/>
       <TradeRequest v-if="hide_trades" @playerTrade = "handlePlayerTrade"/>
-      <button v-else @click="toggle_trades()">Show Trade Menu</button>
+      <button v-else @click="toggle_trades()" class="bg-purple-400 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-full">Show Trade Menu</button>
     </div>
     
-    <TradeResponse
-    v-for="(trade, index) in trades"
-    :key="index"
-    :recieve="{ quantity: trade.recieve_quant, type: trade.recieve_type }"
-    :give="{ quantity: trade.init_quant, type: trade.init_type }"
-    :user="findProfileById(trade.init_id)"
-    @playerTrade="handlePlayerResponse(trade)"
-    />
+    <div class="glass absolute top-[50vw] left-[1vw] w-50 h-40 bg-gradient-to-bl from-violet-500 to-fuchsia-500">
+      <TradeResponse
+      v-for="(trade, index) in trades"
+      :key="index"
+      :recieve="{ quantity: trade.recieve_quant, type: trade.recieve_type }"
+      :give="{ quantity: trade.init_quant, type: trade.init_type }"
+      :user="findProfileById(trade.init_id)"
+      @playerTrade="handlePlayerResponse(trade)"
+      />
+    </div>
+    
   
 
     
-    <div class="absolute top-0 left-0 z-0">
-        <TotalBoard :isTurn="myTurn" v-if="loading === true" :builtRoads="builtRoads" @buildRoad="buildRoad" :settlements="builtSettlements" />
+    <div class="relative top-0 left-0 z-0">
+      <TotalBoard :isTurn="myTurn" v-if="loading === true" :builtRoads="builtRoads" @buildRoad="buildRoad" :settlements="builtSettlements" />
+
+      
+      
+      <div v-else>
+          <span class="loading loading-spinner loading-xl"></span>
+          <p>im loading gimme a sec</p>
+      </div>
+      <DeleteButton v-if="isCreator!=null":isCreator="isCreator"  @delete="handleDelete"/>
+
+      <button class="absolute top-[12vw] left-[1vw] bg-purple-400 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-full" v-if="myTurn" @click ="game.turnOrder(id)" >end turn</button>
         
-        <div v-else>
-            <p>im loading gimme a sec</p>
-        </div>
-        <DeleteButton v-if="isCreator!=null":isCreator="isCreator"  @delete="handleDelete"/>
         
-        <button v-if="myTurn" @click ="game.turnOrder(id)" >end turn</button>
     </div>
 
-    <div class="absolute bottom-0 z-10" >
+    <!-- <div class="absolute bottom-0 z-10" >
         {{ players }}
-    </div>
+    </div> -->
 
-    <div class="grid grid-cols-1 gap-4 absolute right-0 top-[10vw] z-0">
+    <div v-if="the_users" class="grid grid-cols-1 gap-4 absolute right-0 top-[10vw] z-0">
       <div v-for="(the_users, index) in the_users" the_users="the_users"   :key='the_users.username'>
         <div 
         class="player_tag flex items-center w-[18vw] h-[8vw] rounded-full"
         :class="getPlayerColorClass(the_users.color)"
         >
           <div class="w-[5vw] rounded-full">
-            <img class="rounded-full" src="/profile_temp.jpg" alt="profile_pic" />
+            <img class="rounded-full" :src="profilePics[the_users.username]" alt="profile_pic" />
           </div>
           <h2 v-if="!gameStore.room_host">Loading...</h2>
           <h1 class="truncate text-3xl color-white-500" v-else>
@@ -52,6 +60,35 @@
         
         </div>
         
+      </div>
+    </div>
+
+    <img class="absolute top-0 left-0" src="/tradeins.jpg" alt="trade_ins">
+
+    <div v-if="players" class="grid grid-cols-2 gap-4 absolute left-0 top-[18vw] z-0">
+      <div>
+        <img src="/sheep.jpg" alt="sheep">
+        <h2>Sheep: {{ players[yournumber].sheep }} </h2>
+      </div>
+
+       <div >
+        <img src="/stone.jpg" alt="stone">
+        <h2>Stone: {{ players[yournumber].ore }} </h2>
+      </div>
+
+       <div >
+        <img src="/brick.jpg" alt="brick">
+        <h2>Brick: {{ players[yournumber].brick }} </h2>
+      </div>
+
+       <div >
+        <img src="/wood.jpg" alt="wood">
+        <h2>Wood: {{ players[yournumber].wood }}</h2>
+      </div>
+
+       <div >
+        <img src="/wheat.jpg" alt="wheat">
+        <h2>Wheat: {{ players[yournumber].wheat }} </h2>
       </div>
     </div>
   </div>
@@ -81,6 +118,8 @@ import UserProfile from '@/components/UserProfile.vue';
 import type { PostgrestError } from '@supabase/supabase-js';
 import { gamers } from '@/stores/gamer'
 import { roads } from '@/vertex';
+
+
 const game = gameLogic()
 const use_profile=profileStore()
 const loading = ref<boolean>(false)
@@ -92,6 +131,7 @@ const builtRoads = ref<playerRoad[]>([])
 const builtSettlements = ref<Settlement[]>([])
 const gameStore = gamers()
 const router=useRouter()
+const yournumber = ref<number>()
 
 const hide_trades = ref<boolean>(false)
 
@@ -104,12 +144,14 @@ function toggle_trades(){
 }
 
 const the_users = ref()
+const profilePics = reactive<Record<string, string>>({})
 
 onMounted(async()=>{
 
     id.value = useRoute().params.gameid as string
     await game.updateRoute(id.value)
     await use_profile.fetchUserProfile()
+    
     players.value = await gameLoop().getPlayers()
     await game.determineTurn(id.value)
     await subscriptions(id.value)
@@ -121,6 +163,32 @@ onMounted(async()=>{
     const {data: usernames, error} = await supabase.from('game_players').select('username, color').eq('game_id', id.value)
     console.log(usernames,'usernames')
     the_users.value = usernames
+    const {data:idstuff, error: please} = await supabase.from('game_players').select('game_id, player_id_game').eq('game_id', id.value)
+    console.log(please)
+    const ids = idstuff?.map(p => p.player_id_game) || []
+    const { data: names } = await supabase
+      .from('profiles')
+      .select('id, username')
+      .in('id', ids)
+
+    if (names) {
+      for (const user of names) {
+        const { data: pic, error:perror } = await supabase
+          .from('game_players')
+          .select('profile_pic')
+          .eq('username', user.username)
+          .limit(1)
+        console.log(perror)
+
+        if (pic && pic.length > 0) {
+          profilePics[user.username] = pic[0].profile_pic
+        }
+      }
+    }
+
+
+
+
 
     const {data}=await supabase.from('roads').select().eq('game_id',id.value)
     if(data){
@@ -131,6 +199,13 @@ if(settlementData){
       builtSettlements.value = settlementData
     }
     loading.value = true
+  console.log('players.value:', players.value)
+  for(let i = 0; i < players.value.length; i++){
+    
+    if (players.value && players.value[i].player_id_game === use_profile.profile?.id) {
+      yournumber.value = i
+    }
+  }
     
   
   

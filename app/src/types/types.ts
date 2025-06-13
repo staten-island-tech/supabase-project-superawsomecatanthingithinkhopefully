@@ -60,6 +60,7 @@ export interface roomPlayers{
   ore:number,
   wheat:number,
   color: string,
+  username: string,
 
 }
 export interface Vertex{

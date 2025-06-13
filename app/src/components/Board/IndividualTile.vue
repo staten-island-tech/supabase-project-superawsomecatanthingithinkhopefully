@@ -9,15 +9,16 @@
   >
     <div class="grid grid-cols-2 grid-rows-2 w-full h-full gap-1 p-2">
       <p>{{ tile.number }}</p>
-      <p>{{ tile.resource }}</p>
+      <img :src="`/tile_${tile.resource}.png`" alt="resource" class="absolute top-[3vw] right-[3vw] z-10 h-15 w-15">
+      <!-- <p>{{ tile.resource }}</p> -->
       <div v-for="(vertex, index) in tile.vertex" :key="index">
         <div v-if="settlementsAtVertices?.[index].hasSettlement && !settlementsAtVertices[index].isCity">
-          <button @click="$emit('settle', vertex)"><img :src="`/${settlementsAtVertices[index]?.color}_Settlement.png`" alt="settlement" @error="console.error(`Image failed to load: /${settlementsAtVertices[index]?.color}_Settlement.png`)"></button>
+          <button @click="$emit('settle', vertex)"><img class="z-20" :src="`/red_Settlement.png`" alt="settlement" ></button>
 
         </div>
         
         <div v-else-if="settlementsAtVertices?.[index].hasSettlement && settlementsAtVertices[index].isCity">
-          <img :src="`/${settlementsAtVertices[index]?.color}_castle.png`" alt="city">
+          <img class="z-20" :src="`/redcastle.png`" alt="city">
         </div>
 
         <div v-else>
@@ -27,7 +28,7 @@
             class="w-full h-full rounded-lg transition-all duration-300"
             :class="[tileColor.base, tileColor.hover, 'disabled:opacity-50 hover:scale-105']"
           >
-            Build
+            <div class="w-4 h-4 rounded-full bg-blue-500 opacity-70"></div>
           </button>
           
         </div>
@@ -173,7 +174,7 @@ const settlementsAtVertices = computed(() => {
         vertex,
         hasSettlement: !!settlement, 
         isCity: settlement?.is_city || false ,
-        color: settlement?.color,
+        color: settlement?.color || 'gray',
         
       });
     }
