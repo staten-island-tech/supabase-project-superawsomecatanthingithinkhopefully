@@ -32,7 +32,6 @@ const props = defineProps<{
 
 const emit = defineEmits(['settle'])
 
-console.log(1)
 </script>
 
 <style scoped>

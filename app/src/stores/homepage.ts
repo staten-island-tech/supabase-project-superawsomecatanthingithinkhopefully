@@ -8,7 +8,6 @@ export const homePage = defineStore('homePage', () => {
         const {data:userid,error:id_error} = await supabase.auth.getUser()
 
         if (userid.user){
-            // console.log(id_error)
             
         const {data,error} = await supabase.from('profiles').select().eq('id',userid.user.id) 
 

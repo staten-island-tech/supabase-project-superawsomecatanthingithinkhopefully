@@ -229,15 +229,23 @@ function isAdjacent(v1: Vertex, v2: Vertex) {
   );
 }
   async function BuildRoad(userId:string,gameId:string,playerRoads:road[],newRoad:road,playerSettlements:Vertex[]){
+    console.log("attempted road =",newRoad)
+    const {data:playerData,error}=await supabase.from('game_players').select().eq('player_id_game',userId).eq('game_id',gameId).single()
+
     const connectedSettlement = playerSettlements.some((settlement)=>{
        return (newRoad.from.row == settlement.row && newRoad.from.column == settlement.column) || (newRoad.to.row == settlement.row&&newRoad.to.column == settlement.column)
     })
-    const connectedRoad = playerRoads.some((road)=>{
-      return (isAdjacent(road.from, newRoad.from) ||
-    isAdjacent(road.to, newRoad.from) ||
-    isAdjacent(road.from, newRoad.to) ||
-    isAdjacent(road.to, newRoad.to))
-    })
+    console.log(connectedSettlement)
+    const connectedRoad = playerRoads.some((road) => {
+  return (
+    (road.from.row === newRoad.from.row && road.from.column === newRoad.from.column) ||
+    (road.to.row === newRoad.from.row && road.to.column === newRoad.from.column) ||
+    (road.from.row === newRoad.to.row && road.from.column === newRoad.to.column) ||
+    (road.to.row === newRoad.to.row && road.to.column === newRoad.to.column)
+  )
+})
+console.log(connectedRoad)
+
     const roadExists = playerRoads.some(road =>
   ((road.from.row === newRoad.from.row && road.from.column === newRoad.from.column) &&
    (road.to.row === newRoad.to.row && road.to.column === newRoad.to.column)) ||
@@ -245,7 +253,9 @@ function isAdjacent(v1: Vertex, v2: Vertex) {
   ((road.from.row === newRoad.to.row && road.from.column === newRoad.to.column) &&
    (road.to.row === newRoad.from.row && road.to.column === newRoad.from.column))
 );
+console.log(playerData,error)
     if ((connectedRoad || connectedSettlement) && !roadExists){
+      console.log(true)
       const { data, error } = await supabase
   .from('roads')
   .insert({
@@ -253,10 +263,12 @@ function isAdjacent(v1: Vertex, v2: Vertex) {
     player_id: userId,
     from: newRoad.from,  
     to: newRoad.to,      
+    color:playerData.color
   }).select();
   console.log(data)
   console.log(error)
   await buyRoad(userId,gameId)
+  return true
     }
     
   }
