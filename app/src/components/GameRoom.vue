@@ -113,6 +113,8 @@ async function startGame() {
 const tl = gsap.timeline()
 const use_profile = profileStore()
 const auth = ref<User | null>(null)
+
+const newids = ref()
 onMounted(async () => {
   
 
@@ -137,18 +139,29 @@ onMounted(async () => {
     players.value = data
   }
   
-  console.log(players.value)
+  console.log(players.value, 'this one')
   const player_ids = ref<string[]>([])
   for(let i=0; i < players.value.length; i ++){
     player_ids.value.push(players.value[i].player_id_game)
-    console.log(player_ids.value)
+    console.log(player_ids.value, 'here')
   }
 
   
 
   const {data:guys} = await supabase.from('profiles').select('username').in('id', player_ids.value)
-  console.log(guys)
+  console.log(guys, 'guys')
   players.value = guys
+  console.log(players.value)
+  console.log(players.value.length)
+  newids.value = player_ids.value.reverse()
+  console.log(newids.value, 'newids')
+  for(let i =0; i< players.value.length; i++){
+    console.log(players.value[i].username)
+    console.log(player_ids.value)
+    const {error} = await supabase.from('game_players').update({username: players.value[i].username}).eq('game_id', room_id).eq('player_id_game', newids.value[i])
+    console.log(error)
+  }
+
   const { data: rawGamePlayers } = await supabase
     .from('game_players')
     .select('game_id, player_id_game, color')
@@ -284,7 +297,7 @@ let green = ref<boolean>(false)
 let yellow = ref<boolean>(false)
 let black = ref<boolean>(false)
 
-//redo all this color logic to fit with supabase
+
 const I_loveyou_Eyad = reactive({
   active: true,
   'text-danger': true,

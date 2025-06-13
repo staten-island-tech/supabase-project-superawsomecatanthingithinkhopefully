@@ -1,20 +1,24 @@
 <template>
-    <BankTrade @trade = "handleBankTrade"/>
-    <TradeRequest @playerTrade = "handlePlayerTrade"/>
+  <div data-theme="synthwave" class="static min-h-screen" >
+    <div class="absolute top-0 right-0 z-20">
+      <button v-if="hide_trades" @click="toggle_trades()">Hide Trade Menu</button>
+      <BankTrade v-if="hide_trades" @trade = "handleBankTrade"/>
+      <TradeRequest v-if="hide_trades" @playerTrade = "handlePlayerTrade"/>
+      <button v-else @click="toggle_trades()">Show Trade Menu</button>
+    </div>
+    
     <TradeResponse
-  v-for="(trade, index) in trades"
-  :key="index"
-  :recieve="{ quantity: trade.recieve_quant, type: trade.recieve_type }"
-  :give="{ quantity: trade.init_quant, type: trade.init_type }"
-  :user="findProfileById(trade.init_id)"
-  @playerTrade="handlePlayerResponse(trade)"
-/>
+    v-for="(trade, index) in trades"
+    :key="index"
+    :recieve="{ quantity: trade.recieve_quant, type: trade.recieve_type }"
+    :give="{ quantity: trade.init_quant, type: trade.init_type }"
+    :user="findProfileById(trade.init_id)"
+    @playerTrade="handlePlayerResponse(trade)"
+    />
   
 
-    <div >
-        {{ players }}
-    </div>
-    <div>
+    
+    <div class="absolute top-0 left-0 z-0">
         <TotalBoard :isTurn="myTurn" v-if="loading === true" :builtRoads="builtRoads" @buildRoad="buildRoad" :settlements="builtSettlements" />
         
         <div v-else>
@@ -24,18 +28,47 @@
         
         <button v-if="myTurn" @click ="game.turnOrder(id)" :disabled="isInitialPlacementPhase">end turn</button>
     </div>
-    
+
+    <div class="absolute bottom-0 z-10" >
+        {{ players }}
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 absolute right-0 top-[10vw] z-0">
+      <div v-for="(the_users, index) in the_users" the_users="the_users"   :key='the_users.username'>
+        <div 
+        class="player_tag flex items-center w-[18vw] h-[8vw] rounded-full"
+        :class="getPlayerColorClass(the_users.color)"
+        >
+          <div class="w-[5vw] rounded-full">
+            <img class="rounded-full" src="/profile_temp.jpg" alt="profile_pic" />
+          </div>
+          <h2 v-if="!gameStore.room_host">Loading...</h2>
+          <h1 class="truncate text-3xl color-white-500" v-else>
+            {{ the_users.username }}
+            
+          
+          </h1>
+        
+        
+        </div>
+        
+      </div>
+    </div>
+  </div>
 
 </template>
 
 <script setup lang="ts">
+
+//get profile pics like you did for usernames, put it in game_players table and push it in Gameroom
+
 const use_rooms = rooms()
 import BankTrade from '@/components/Trades/BankTrade.vue';
 import DeleteButton from '@/components/DeleteButton.vue';
 import TotalBoard from '@/components/Board/TotalBoard.vue';
 import { rooms } from '@/stores/rooms';
 import { supabase } from '@/lib/supabaseClient'
-import { onMounted,ref,computed } from 'vue';
+import { onMounted,ref, reactive, computed } from 'vue';
 import { profileStore } from '@/stores/profile';
 import { useRoute,useRouter } from 'vue-router';
 import { gameLogic } from '@/stores/setup';
@@ -46,6 +79,7 @@ import TradeRequest from '@/components/Trades/TradeRequest.vue';
 import TradeResponse from '@/components/Trades/TradeResponse.vue';
 import UserProfile from '@/components/UserProfile.vue';
 import type { PostgrestError } from '@supabase/supabase-js';
+import { gamers } from '@/stores/gamer'
 import { roads } from '@/vertex';
 const game = gameLogic()
 const use_profile=profileStore()
@@ -56,8 +90,21 @@ const players =ref<roomPlayers[]|null>(null)
 const trades = ref<Trade[]|null>()
 const builtRoads = ref<playerRoad[]>([])
 const builtSettlements = ref<Settlement[]>([])
-
+const gameStore = gamers()
 const router=useRouter()
+
+const hide_trades = ref<boolean>(false)
+
+function toggle_trades(){
+  if (hide_trades.value === true){
+    hide_trades.value = false
+  } else{
+    hide_trades.value = true
+  }
+}
+
+const the_users = ref()
+
 onMounted(async()=>{
 
     id.value = useRoute().params.gameid as string
@@ -70,6 +117,11 @@ onMounted(async()=>{
     await loadInitiatorProfiles(trades.value);
     isCreator.value = await rooms().fetchRoomCreator(id.value,use_profile.profile?.id)
     console.log("this is gam baord")
+
+    const {data: usernames, error} = await supabase.from('game_players').select('username, color').eq('game_id', id.value)
+    console.log(usernames,'usernames')
+    the_users.value = usernames
+
     const {data}=await supabase.from('roads').select().eq('game_id',id.value)
     if(data){
       builtRoads.value = data
@@ -80,6 +132,9 @@ if(settlementData){
     }
     console.log(use_profile.profile?.id === game.current_player)
     loading.value = true
+    
+  
+  
 })
 const tradeData = ref<Trade|null>(null)
 async function handlePlayerTrade(selectedPlayerResource:string,selectedPlayerQuantity:number,desiredPlayerResource:string,desiredPlayerQuantity:number){
@@ -100,7 +155,12 @@ if (
 
       
   id.value
-) 
+)
+
+// for each username in the room, grab the username and color
+
+
+
 tradeData.value = data
 console.log(data)
 initPlayerProfile.value = await use_profile.fetchUserById(use_profile.profile.id)
@@ -318,6 +378,51 @@ builtRoads.value.push(payload.new as playerRoad)
   )
   .subscribe()
     }
+
+
+
+
+
+let purple = ref<boolean>(true)
+let currentcolor = ref(purple)
+let red = ref<boolean>(false)
+let blue = ref<boolean>(false)
+let green = ref<boolean>(false)
+let yellow = ref<boolean>(false)
+let black = ref<boolean>(false)
+
+
+const I_loveyou_Eyad = reactive({
+  active: true,
+  'text-danger': true,
+  'bg-linear-to-bl from-violet-500 to-fuchsia-500': purple,
+  'bg-linear-to-bl from-red-600 to-red-900': red,
+  'bg-linear-to-bl from-sky-600 to-blue-900': blue,
+  'bg-linear-to-bl from-green-600 to-green-800': green,
+  'bg-linear-to-bl from-amber-300 to-amber-500': yellow,
+  'bg-linear-to-bl from-zinc-500 to-zinc-800': black,
+})
+
+
+
+function getPlayerColorClass(color: string) {
+  switch (color) {
+    case 'red': return 'bg-gradient-to-bl from-red-600 to-red-900'
+    case 'purple': return 'bg-gradient-to-bl from-violet-500 to-fuchsia-500'
+    case 'blue': return 'bg-gradient-to-bl from-sky-600 to-blue-900'
+    case 'green': return 'bg-gradient-to-bl from-green-600 to-green-800'
+    case 'yellow': return 'bg-gradient-to-bl from-amber-300 to-amber-500'
+    case 'black': return 'bg-gradient-to-bl from-zinc-500 to-zinc-800'
+    default: return 'bg-gray-500'
+  }
+}
+const allColors = ['red', 'blue', 'green', 'yellow', 'purple', 'black']
+
+const takenColors = computed(() => players.value?.map(p => p.color).filter(Boolean))
+
+const availableColors = computed(() =>
+  allColors.filter(color => !takenColors.value?.includes(color))
+)
 </script>
 
 <style scoped>

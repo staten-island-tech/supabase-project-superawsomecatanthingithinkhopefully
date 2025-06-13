@@ -59,6 +59,7 @@ export interface roomPlayers{
   sheep:number,
   ore:number,
   wheat:number,
+  color: string,
 
 }
 export interface Vertex{
