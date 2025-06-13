@@ -71,7 +71,7 @@ import { PostgrestError, type User } from '@supabase/supabase-js'
 import { ref, reactive } from 'vue'
 import { onMounted } from 'vue'
 import { stringify } from 'querystring'
-import { type Hosttype, type Name_TagType, type GamePlayer,type roomPlayers } from '@/types/types'
+import { type Hosttype, type Name_TagType, type GamePlayer } from '@/types/types'
 import { gamers } from '@/stores/gamer'
 import { gameLogic } from '@/stores/setup'
 import LogIn from './LogIn.vue'
@@ -355,9 +355,7 @@ function getPlayerColorClass(color: string) {
 }
 const allColors = ['red', 'blue', 'green', 'yellow', 'purple', 'black']
 
-const takenColors = computed(() => 
-  (players.value as roomPlayers[]).map((p) => p.color).filter(Boolean)
-)
+const takenColors = computed(() => players.value.map(p => p.color).filter(Boolean))
 
 const availableColors = computed(() =>
   allColors.filter(color => !takenColors.value.includes(color))
