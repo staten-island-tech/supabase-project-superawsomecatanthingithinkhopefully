@@ -109,8 +109,11 @@ async function handleLog() {
   if (!result.error) {
     
     //router.push({ path: '/dash' })
-    const redirectPath = route.query.redirect || '/dash';
-    router.push(redirectPath);
+    const redirectPath = Array.isArray(route.query.redirect)
+  ? route.query.redirect[0] || '/dash'
+  : route.query.redirect || '/dash';
+
+router.push(redirectPath);
     
   }
 }
