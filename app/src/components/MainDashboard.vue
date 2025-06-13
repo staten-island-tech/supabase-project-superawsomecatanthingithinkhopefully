@@ -89,6 +89,7 @@ import { onMounted,ref } from 'vue'
 import { supabase } from '@/lib/supabaseClient'
 import type { PostgrestError } from '@supabase/supabase-js'
 import { nextTick } from 'vue'
+import { onUnmounted } from 'vue'
 
 
 
@@ -109,10 +110,10 @@ function handleMouseMove(event: MouseEvent) {
   const { innerWidth } = window
   const x = event.clientX
 
-  // Distance from right, converted to range 0 (left) to 1 (right)
+  
   const proximityToLeft = 1 - (x / innerWidth)
 
-  // Animate opacity of image layer based on proximity to right
+  
   
   gsap.to('.centerlogo', {
     opacity: proximityToLeft,
@@ -142,9 +143,16 @@ async function handleRoom() {
 const fetched_data = ref<RoomInfo[]|undefined>([])
 const data = ref<profileType|null>(null)
 const tl = gsap.timeline()
+
+const audio = ref(new Audio('/Never getting back together Trump x Elon.mp3'))
+
 onMounted(async ()=>{
   tl.set('.name', {opacity: 0, y: '100vw'})
   tl.set('.create_box', {opacity: 0, y: '100vw'})
+
+  
+  audio.value.play()
+
 
   const user_info = await use_user.fetchUserData()
   const room_data = await use_rooms.fetchRooms()
@@ -168,6 +176,10 @@ onMounted(async ()=>{
 
 })
 
+onUnmounted(() => {
+  audio.value.pause()
+  audio.value.currentTime = 0
+})
 
 </script>
 

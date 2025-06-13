@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8" @mousemove="playAudio()">
       <div class="sm:mx-auto sm:w-full sm:max-w-sm">
         <img class="logo mx-auto h-50 w-auto" src="/Logo.png" alt="Your Company" />
         <h2 class="Login mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
@@ -70,10 +70,18 @@ import { RouterLink } from 'vue-router'
 import { onMounted } from 'vue'
 import { userInfo } from 'os'
 import { gsap } from "gsap"
+import { onUnmounted } from 'vue'
+import { ref } from 'vue'
 
 const tl = gsap.timeline();
+const audio = ref(new Audio('/Game of Thrones.mp3'))
+
+function playAudio(){
+  audio.value.play()
+}
 
 onMounted(() => {
+  
 
   tl.set('.email_box', {x:'-100vw', opacity: 0})
     .set('.password_box', {x:'100vw', opacity: 0})
@@ -81,8 +89,9 @@ onMounted(() => {
     .set('.Signup', { scale: 0.5, opacity:0})
     .set('.Login', { scale: 0.5, opacity:0})
     .set('.logo', {opacity: 0})
+    
 
-    .to('.logo', {opacity: 1, duration: 2, ease: 'power4.in'})
+  tl.to('.logo', {opacity: 1, duration: 2, ease: 'power4.in'})
     .to('.email_box', {x:0, duration: 2, opacity: 1, ease: 'power2.out'}, '+=1')
     .to('.password_box', {x:0, duration: 2, opacity: 1, ease: 'power2.out'}, '-=1')
     .to('.submit_button', {scale: 1, opacity: 1, duration: 2,  ease: 'bounce.out'})
@@ -106,6 +115,10 @@ async function handleLog() {
     
   }
 }
+onUnmounted(() => {
+  audio.value.pause()
+  audio.value.currentTime = 0
+})
 </script>
 
 <style scoped></style>

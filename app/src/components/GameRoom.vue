@@ -32,7 +32,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 absolute left-0 top-[10vw]">
           <div v-for="(players, index) in players" players="players"   :key='players.username'>
             <div 
-            class="flex items-center w-[18vw] h-[8vw] rounded-full"
+            class="player_tag flex items-center w-[18vw] h-[8vw] rounded-full"
             :class="getPlayerColorClass(players.color)"
             >
               <div class="w-[5vw] rounded-full">
@@ -75,6 +75,8 @@ import { type Hosttype, type Name_TagType, type GamePlayer } from '@/types/types
 import { gamers } from '@/stores/gamer'
 import { gameLogic } from '@/stores/setup'
 import LogIn from './LogIn.vue'
+import { gsap } from 'gsap/gsap-core'
+
 // Eyad made a low taper fade meme reference just nuke his HOS
 const players = ref<any>([])
 const player_names = ref()
@@ -108,10 +110,12 @@ async function startGame() {
     console.error('Error starting game:', error)
   }
 }
-
+const tl = gsap.timeline()
 const use_profile = profileStore()
 const auth = ref<User | null>(null)
 onMounted(async () => {
+  
+
   const result = await use_profile.fetchUserProfile()
   auth.value = result.user
   console.log(result, 'result')
@@ -139,6 +143,9 @@ onMounted(async () => {
     player_ids.value.push(players.value[i].player_id_game)
     console.log(player_ids.value)
   }
+
+  
+
   const {data:guys} = await supabase.from('profiles').select('username').in('id', player_ids.value)
   console.log(guys)
   players.value = guys
@@ -162,6 +169,7 @@ onMounted(async () => {
   //   }
   // })
   console.log(players.value)
+  tl.set('.player_tag', {opacity: 0, scale: 0.25})
   const myChannel= supabase.channel('game_players_resource')
   
 
@@ -223,6 +231,8 @@ onMounted(async () => {
       }
     )
     .subscribe()
+  
+  tl.to('.player_tag', {opacity: 1, scale: 1, duration: 1, ease: 'power4.out'})
   
 
 
