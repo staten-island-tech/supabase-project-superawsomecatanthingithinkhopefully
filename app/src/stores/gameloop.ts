@@ -134,10 +134,9 @@ export const gameLoop = defineStore('gameLoop', () => {
         return gamePlayers
     }
     
-    async function resourceDistribution(game_id: string) {
+    async function resourceDistribution(game_id: string,diceRoll:number) {
       console.log("YABAADE")
-  const diceRoll = Math.floor(Math.random()*11)+1
-  console.log(diceRoll)
+  
   if (diceRoll === 7) {
     await loseRandomResources()
     return

@@ -7,7 +7,7 @@
       <button v-else @click="toggle_trades()" class="bg-purple-400 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-full">Show Trade Menu</button>
     </div>
     
-    <div class="glass absolute top-[50vw] left-[1vw] w-50 h-40 bg-gradient-to-bl from-violet-500 to-fuchsia-500">
+    <div class="glass absolute top-[50vw] left-[1vw] w-50 h-20 bg-gradient-to-bl from-violet-500 to-fuchsia-500">
       <TradeResponse
       v-for="(trade, index) in trades"
       :key="index"
@@ -31,8 +31,20 @@
           <p>im loading gimme a sec</p>
       </div>
 
-      <button class="absolute top-[12vw] left-[1vw] bg-purple-400 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-full" v-if="myTurn" @click ="game.turnOrder(id)" >end turn</button>
-        
+      <button
+  class="absolute top-[12vw] left-[1vw] bg-purple-400 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-full"
+  v-if="myTurn"
+  @click="endTurn()"
+>
+  End Turn
+</button>
+
+<h3
+  class="absolute top-[8vw]  text-xl font-bold text-white  bg-opacity-70 rounded-lg px-6 py-2 shadow-lg"
+>
+  You rolled an {{ diceRoll }}
+</h3>
+
         
     </div>
 
@@ -140,7 +152,12 @@ function toggle_trades(){
     hide_trades.value = true
   }
 }
+const diceRoll=ref<number>(0)
+async function endTurn() {
+  diceRoll.value = Math.floor(Math.random() * 11) + 1
 
+  await game.turnOrder(id.value, diceRoll.value)
+}
 const the_users = ref()
 const profilePics = reactive<Record<string, string>>({})
 
@@ -428,7 +445,7 @@ console.log(game.current_player)
       if (newSettlement.is_city) {
         builtSettlements.value = builtSettlements.value.filter(
           (settlement) =>
-            (settlement.id === newSettlement.id&&!newSettlement.is_city) 
+            (settlement.id === newSettlement.id) 
         );
       }
 

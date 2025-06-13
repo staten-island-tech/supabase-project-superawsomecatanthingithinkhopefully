@@ -130,7 +130,7 @@ export const gameLogic = defineStore('gameLogic', () => {
     }
   }
 
-  async function turnOrder(route_id: string) {
+  async function turnOrder(route_id: string,diceRoll:number) {
     await supabase.from('trades').delete().eq('game_id',route_id)
     const { data: selectData } = await supabase
       .from('game_players')
@@ -152,7 +152,7 @@ export const gameLogic = defineStore('gameLogic', () => {
         data.turn_index = 0
         data.round += 1}
       if(data.round>=1){
-        await gameLoop().resourceDistribution(route_id)
+        await gameLoop().resourceDistribution(route_id,diceRoll)
       }
        else {
         data.turn_index += 1

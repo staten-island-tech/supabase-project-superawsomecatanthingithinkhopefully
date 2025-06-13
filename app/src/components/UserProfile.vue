@@ -7,7 +7,7 @@
                     <img :src="picture" alt="profile_picture" class="rounded-full w-55 h-55" >
                 </div>
                 
-                <div class="relative top-[5vw] left-[39vw] w-75 bg-purple-500  flex items-center justify-center w-20 h-10">
+                <div class="relative top-[5vw] left-[39vw]  bg-purple-500  flex items-center justify-center w-20 h-10">
                     <input v-model="urlInput" placeholder="Enter image URL" />
                     <button @click="updateProfilePicture">Update Picture</button>
                 </div>
@@ -17,8 +17,7 @@
                 </div>
                 
                 <div class="relative top-[12vw] left-[43vw] bg-purple-500 w-45 h-20 flex flex-col items-center justify-center rounded-full">
-                  <h2 >Wins: {{ use_profile.profile.wins }}</h2>
-                  <h2 >Losees: {{ use_profile.profile.losses }}</h2>
+                  
                 </div>
                 
                 
