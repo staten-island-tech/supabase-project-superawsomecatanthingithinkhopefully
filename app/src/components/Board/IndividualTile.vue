@@ -12,12 +12,12 @@
       <p>{{ tile.resource }}</p>
       <div v-for="(vertex, index) in tile.vertex" :key="index">
         <div v-if="settlementsAtVertices?.[index].hasSettlement && !settlementsAtVertices[index].isCity">
-          <button @click="$emit('settle', vertex)">y</button>
+          <button @click="$emit('settle', vertex)"><img :src="`/${settlementsAtVertices[index]?.color}_Settlement.png`" alt="settlement" @error="console.error(`Image failed to load: /${settlementsAtVertices[index]?.color}_Settlement.png`)"></button>
 
         </div>
         
         <div v-else-if="settlementsAtVertices?.[index].hasSettlement && settlementsAtVertices[index].isCity">
-          <p>City here!</p>
+          <img :src="`/${settlementsAtVertices[index]?.color}_castle.png`" alt="city">
         </div>
 
         <div v-else>
@@ -40,7 +40,7 @@
           class="absolute w-6 h-1 rounded-full"
           :class="[road.position, road.color]"
         >
-          <p :class="['road-text', road.color]">hello i am road {{ road.color }}</p>
+          <div class=" w-20 h-4 z-30" :class="['road-text', road.color]" ></div>
         </div>
       </div>
 
@@ -72,6 +72,20 @@ const props = defineProps<{
     builtRoads:playerRoad[]
     settlements:Settlement[]
 }>();
+
+
+const tailwindRoadColor = {
+    red: 'bg-red-700',
+    blue: 'bg-blue-700',
+    green: 'bg-green-700',
+    yellow: 'bg-yellow-400',
+    purple: 'bg-purple-700',
+    black: 'bg-zinc-800',
+  };
+
+
+
+
 
 
 const tileColor = computed(() => {
@@ -121,6 +135,7 @@ const roadStates = computed(() => {
         
         isBuilt = true;  
         roadColor = existingRoad.color;  
+        roadColor = tailwindRoadColor[existingRoad.color] || 'bg-gray-400';
         break;  
       }
     }
@@ -157,12 +172,15 @@ const settlementsAtVertices = computed(() => {
       result.push({
         vertex,
         hasSettlement: !!settlement, 
-        isCity: settlement?.is_city || false 
+        isCity: settlement?.is_city || false ,
+        color: settlement?.color,
+        
       });
     }
   }
 
   return result;  
+  
 });
 
 
@@ -195,28 +213,40 @@ const settlementsAtVertices = computed(() => {
   opacity: 0.5;
 }
 
+.road-top,
+.road-bottom,
+.road-left,
+.road-right {
+  position: absolute;
+  width: 40px;
+  height: 6px;
+  border-radius: 9999px;
+  transform-origin: center;
+}
+
+/* Specific orientations */
 .road-top {
-  top: -16px; /* Move up to overlap */
+  top: -10px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) rotate(0deg);
 }
 
 .road-right {
+  right: -10px;
   top: 50%;
-  right: -16px; /* Move right to overlap */
-  transform: translateY(-50%);
+  transform: translateY(-50%) rotate(90deg);
 }
 
 .road-bottom {
-  bottom: -16px; /* Move down to overlap */
+  bottom: -10px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) rotate(0deg);
 }
 
 .road-left {
+  left: -10px;
   top: 50%;
-  left: -16px; /* Move left to overlap */
-  transform: translateY(-50%);
+  transform: translateY(-50%) rotate(90deg);
 }
 
 </style>

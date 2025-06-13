@@ -32,7 +32,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 absolute left-0 top-[10vw]">
           <div v-for="(players, index) in players" players="players"   :key='players.username'>
             <div 
-            class="flex items-center w-[18vw] h-[8vw] rounded-full"
+            class="player_tag flex items-center w-[18vw] h-[8vw] rounded-full"
             :class="getPlayerColorClass(players.color)"
             >
               <div class="w-[5vw] rounded-full">
@@ -75,6 +75,8 @@ import { type Hosttype, type Name_TagType, type GamePlayer } from '@/types/types
 import { gamers } from '@/stores/gamer'
 import { gameLogic } from '@/stores/setup'
 import LogIn from './LogIn.vue'
+import { gsap } from 'gsap/gsap-core'
+
 // Eyad made a low taper fade meme reference just nuke his HOS
 const players = ref<any>([])
 const player_names = ref()
@@ -106,10 +108,14 @@ async function startGame() {
   if (error) {
   }
 }
-
+const tl = gsap.timeline()
 const use_profile = profileStore()
 const auth = ref<User | null>(null)
+
+const newids = ref()
 onMounted(async () => {
+  
+
   const result = await use_profile.fetchUserProfile()
   auth.value = result.user
   
@@ -128,12 +134,29 @@ onMounted(async () => {
     players.value = data
   }
   
+  console.log(players.value, 'this one')
   const player_ids = ref<string[]>([])
   for(let i=0; i < players.value.length; i ++){
     player_ids.value.push(players.value[i].player_id_game)
+    console.log(player_ids.value, 'here')
   }
+
+  
+
   const {data:guys} = await supabase.from('profiles').select('username').in('id', player_ids.value)
+  console.log(guys, 'guys')
   players.value = guys
+  console.log(players.value)
+  console.log(players.value.length)
+  newids.value = player_ids.value.reverse()
+  console.log(newids.value, 'newids')
+  for(let i =0; i< players.value.length; i++){
+    console.log(players.value[i].username)
+    console.log(player_ids.value)
+    const {error} = await supabase.from('game_players').update({username: players.value[i].username}).eq('game_id', room_id).eq('player_id_game', newids.value[i])
+    console.log(error)
+  }
+
   const { data: rawGamePlayers } = await supabase
     .from('game_players')
     .select('game_id, player_id_game, color')
@@ -153,6 +176,8 @@ onMounted(async () => {
   //     color: match?.color || 'gray' // default fallback color
   //   }
   // })
+  console.log(players.value)
+  tl.set('.player_tag', {opacity: 0, scale: 0.25})
   const myChannel= supabase.channel('game_players_resource')
   
 
@@ -213,6 +238,8 @@ onMounted(async () => {
     )
     .subscribe()
   
+  tl.to('.player_tag', {opacity: 1, scale: 1, duration: 1, ease: 'power4.out'})
+  
 
 
 
@@ -263,7 +290,7 @@ let green = ref<boolean>(false)
 let yellow = ref<boolean>(false)
 let black = ref<boolean>(false)
 
-//redo all this color logic to fit with supabase
+
 const I_loveyou_Eyad = reactive({
   active: true,
   'text-danger': true,

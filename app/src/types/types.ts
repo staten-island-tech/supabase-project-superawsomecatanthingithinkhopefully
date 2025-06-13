@@ -11,7 +11,8 @@ export interface profileType {
   id: string;
   username: string;
   wins:number;
-  losses:number
+  losses:number;
+  profile_pic: string;
   
 
 }
@@ -58,6 +59,7 @@ export interface roomPlayers{
   sheep:number,
   ore:number,
   wheat:number,
+  color: string,
 
 }
 export interface Vertex{
