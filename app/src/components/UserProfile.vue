@@ -7,7 +7,7 @@
                     <img :src="picture" alt="profile_picture" class="rounded-full w-55 h-55" >
                 </div>
                 
-                <div class="relative top-[5vw] left-[39vw]  bg-purple-500  flex items-center justify-center w-20 h-10">
+                <div class="relative top-[5vw] left-[39vw] w-75 bg-purple-500  flex items-center justify-center  h-10">
                     <input v-model="urlInput" placeholder="Enter image URL" />
                     <button @click="updateProfilePicture">Update Picture</button>
                 </div>
