@@ -8,7 +8,7 @@
                 </div>
                 
                 <div class="relative top-[5vw] left-[39vw] w-75 bg-purple-500  flex items-center justify-center  h-10">
-                    <input v-model="urlInput" placeholder="Enter image URL" />
+                    <input v-model="urlInput" placeholder="Enter image Ucd appRL" />
                     <button @click="updateProfilePicture">Update Picture</button>
                 </div>
                 

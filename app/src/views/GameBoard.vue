@@ -437,24 +437,31 @@ console.log(game.current_player)
       filter: `game_id=eq.${id.value}`
     },
     async (payload) => {
-      console.log("ts is settlements",payload)
-      
-      const newSettlement = payload.new as Settlement
-      console.log("HEY BOZO THIS IS THE THING")
-      console.log(newSettlement)
-      if (newSettlement.is_city) {
-        builtSettlements.value = builtSettlements.value.filter(
-          (settlement) =>
-            (settlement.id === newSettlement.id) 
-        );
+      console.log("SETTLEMENT UPDATE RECEIVED:", payload);
+
+      const newSettlement = payload.new as Settlement;
+
+      // Try to find and update the existing settlement
+      let found = false;
+
+      builtSettlements.value = builtSettlements.value.map(settlement => {
+        if (settlement.id === newSettlement.id) {
+          found = true;
+          return newSettlement; // Replace with the new version (might now be a city)
+        }
+        return settlement;
+      });
+
+      // If it wasn't found, push it as a new settlement
+      if (!found) {
+        builtSettlements.value.push(newSettlement);
       }
 
-      builtSettlements.value.push(newSettlement);
-
-      console.log(builtSettlements.value)
+      console.log("Updated settlements:", builtSettlements.value);
     }
   )
-  .subscribe()
+  .subscribe();
+
     const roadChannel= supabase.channel('roadChannel')
   .on(
     'postgres_changes',

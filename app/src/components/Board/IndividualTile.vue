@@ -12,11 +12,11 @@
       <div v-for="(vertex, index) in tile.vertex" :key="index">
         <div v-if="settlementsAtVertices?.[index].hasSettlement && !settlementsAtVertices[index].isCity">
           <button @click="$emit('settle', vertex)"><img src="/red_Settlement.png" alt="settlement" @error="console.error(`Image failed to load: /${settlementsAtVertices[index]?.color}_Settlement.png`)"></button>
-
+          <p>upgraded!</p>
         </div>
         
         <div v-else-if="settlementsAtVertices?.[index].hasSettlement && settlementsAtVertices[index].isCity">
-          <img src="/redcastle.png" alt="city">
+          <img src="/purple.png" alt="city">
         </div>
 
         <div v-else>
