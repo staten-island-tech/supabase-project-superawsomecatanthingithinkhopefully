@@ -147,7 +147,7 @@ export const gameLogic = defineStore('gameLogic', () => {
     if (selectData && data && selectData[data.turn_index]) {
       current_player.value = selectData[data.turn_index].player_id_game
     }
-    if (data) {
+   if (data) {
       if (data.turn_index + 1 >= data.number_player) {
         data.turn_index = 0
         data.round += 1}
