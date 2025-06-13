@@ -138,7 +138,7 @@ onMounted(async () => {
   if (data){
     players.value = data
   }
-  
+
   console.log(players.value, 'this one')
   const player_ids = ref<string[]>([])
   for(let i=0; i < players.value.length; i ++){
