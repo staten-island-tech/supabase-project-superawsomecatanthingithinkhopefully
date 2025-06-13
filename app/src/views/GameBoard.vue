@@ -1,5 +1,5 @@
 <template>
-  <div data-theme="synthwave" class="static min-h-screen relative flex flex-col" >
+  <div data-theme="synthwave" class=" min-h-screen relative flex flex-col" >
     <div class="absolute top-0 right-0 z-20">
       <button v-if="hide_trades" @click="toggle_trades()" class="bg-purple-400 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-full">Hide Trade Menu</button>
       <BankTrade v-if="hide_trades" @trade = "handleBankTrade"/>
@@ -30,7 +30,6 @@
           <span class="loading loading-spinner loading-xl"></span>
           <p>im loading gimme a sec</p>
       </div>
-      <DeleteButton v-if="isCreator!=null":isCreator="isCreator"  @delete="handleDelete"/>
 
       <button class="absolute top-[12vw] left-[1vw] bg-purple-400 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-full" v-if="myTurn" @click ="game.turnOrder(id)" >end turn</button>
         
@@ -65,7 +64,7 @@
 
     <img class="absolute top-0 left-0" src="/tradeins.jpg" alt="trade_ins">
 
-    <div v-if="players" class="grid grid-cols-2 gap-4 absolute left-0 top-[18vw] z-0">
+    <div v-if="players&&players[yournumber]" class="grid grid-cols-2 gap-4 absolute left-0 top-[18vw] z-0">
       <div>
         <img src="/sheep.jpg" alt="sheep">
         <h2>Sheep: {{ players[yournumber].sheep }} </h2>
@@ -101,7 +100,6 @@
 
 const use_rooms = rooms()
 import BankTrade from '@/components/Trades/BankTrade.vue';
-import DeleteButton from '@/components/DeleteButton.vue';
 import TotalBoard from '@/components/Board/TotalBoard.vue';
 import { rooms } from '@/stores/rooms';
 import { supabase } from '@/lib/supabaseClient'
@@ -131,7 +129,7 @@ const builtRoads = ref<playerRoad[]>([])
 const builtSettlements = ref<Settlement[]>([])
 const gameStore = gamers()
 const router=useRouter()
-const yournumber = ref<number>()
+const yournumber = ref<number>(0)
 
 const hide_trades = ref<boolean>(false)
 
@@ -200,12 +198,15 @@ if(settlementData){
     }
     loading.value = true
   console.log('players.value:', players.value)
-  for(let i = 0; i < players.value.length; i++){
+  if(players.value){
+    for(let i = 0; i < players.value.length; i++){
     
     if (players.value && players.value[i].player_id_game === use_profile.profile?.id) {
       yournumber.value = i
     }
   }
+  }
+  
     
   
   

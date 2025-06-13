@@ -22,6 +22,7 @@
 
           <div class=" relative top-[10vw] left-[42vw] h-60 w-60">
             <img class='centerlogo h-60 w-60' src="/Logo.png" alt="Temp">
+              <div v-if="fetched_data!=undefined" class="text-sm">There are {{ fetched_data.length}} rooms currently active</div>
 
           </div>
 

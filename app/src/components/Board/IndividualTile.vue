@@ -8,32 +8,36 @@
     ]"
   >
     <div class="grid grid-cols-2 grid-rows-2 w-full h-full gap-1 p-2">
-      <p>{{ tile.number }}</p>
-      <img :src="`/tile_${tile.resource}.png`" alt="resource" class="absolute top-[3vw] right-[3vw] z-10 h-15 w-15">
-      <!-- <p>{{ tile.resource }}</p> -->
+      
       <div v-for="(vertex, index) in tile.vertex" :key="index">
         <div v-if="settlementsAtVertices?.[index].hasSettlement && !settlementsAtVertices[index].isCity">
-          <button @click="$emit('settle', vertex)"><img class="z-20" :src="`/red_Settlement.png`" alt="settlement" ></button>
+          <button @click="$emit('settle', vertex)"><img src="/red_Settlement.png" alt="settlement" @error="console.error(`Image failed to load: /${settlementsAtVertices[index]?.color}_Settlement.png`)"></button>
 
         </div>
         
         <div v-else-if="settlementsAtVertices?.[index].hasSettlement && settlementsAtVertices[index].isCity">
-          <img class="z-20" :src="`/redcastle.png`" alt="city">
+          <img src="/redcastle.png" alt="city">
         </div>
 
         <div v-else>
           <button
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-300"
+
             @click="$emit('settle', vertex)"
             :disabled="!isTurn"
-            class="w-full h-full rounded-lg transition-all duration-300"
             :class="[tileColor.base, tileColor.hover, 'disabled:opacity-50 hover:scale-105']"
           >
-            <div class="w-4 h-4 rounded-full bg-blue-500 opacity-70"></div>
+            Build
           </button>
           
         </div>
+        
       </div>
     </div>
+      <p class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl font-bold text-white z-30 drop-shadow-md">
+  {{ tile.number }}
+</p>
+      <img :src="`/tile_${tile.resource}.png`" alt="resource" class="absolute top-[3vw] right-[3vw] z-10 h-15 w-15">
 
     <div v-for="(road, idx) in roadStates" :key="'road-' + idx">
       <div v-if="road.isBuilt">
@@ -52,7 +56,7 @@
         @click="$emit('buildRoad', road)"
         :disabled="!isTurn"
       >
-        Build road
+        
       </button>
     </div>
   </div>
@@ -63,7 +67,6 @@
 
 
 <script setup lang="ts">
-import VertexButton from "@/components/Board/VertexButton.vue"
 import type { playerRoad, road, Settlement, Tiles, Vertices,Vertex } from '@/types/types';
 import { computed } from 'vue';
 const emit = defineEmits(['buildRoad','settle'])
@@ -75,14 +78,7 @@ const props = defineProps<{
 }>();
 
 
-const tailwindRoadColor = {
-    red: 'bg-red-700',
-    blue: 'bg-blue-700',
-    green: 'bg-green-700',
-    yellow: 'bg-yellow-400',
-    purple: 'bg-purple-700',
-    black: 'bg-zinc-800',
-  };
+
 
 
 
@@ -136,7 +132,7 @@ const roadStates = computed(() => {
         
         isBuilt = true;  
         roadColor = existingRoad.color;  
-        roadColor = tailwindRoadColor[existingRoad.color] || 'bg-gray-400';
+        roadColor = tailwindRoadColor[existingRoad.color as RoadColor] || 'bg-gray-400';
         break;  
       }
     }
@@ -151,7 +147,16 @@ const roadStates = computed(() => {
     };
   });
 });
+const tailwindRoadColor = {
+  red: 'bg-red-500',
+  blue: 'bg-blue-500',
+  green: 'bg-green-500',
+  yellow: 'bg-yellow-500',
+  purple: 'bg-purple-500',
+  black: 'bg-black-500'
+} as const; 
 
+type RoadColor = keyof typeof tailwindRoadColor;
 
 const settlementsAtVertices = computed(() => {
   const result = [];  

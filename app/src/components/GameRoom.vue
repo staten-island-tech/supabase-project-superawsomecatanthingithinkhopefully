@@ -8,9 +8,7 @@
         <!-- <div class="w-full flex justify-center"> -->
       </div>
 
-      <div class="absolute right-[5vw] top[3vw] w-[40vw] h-[15vw] glass">
-        <h1 class="underline text-center font-bold">Room Settings</h1>
-      </div>
+      
 
       <div class="absolute right-[5vw] top-[17vw] w-[40vw] h-[27vw]">
         <details class="dropdown absolute top-0 left-0">
@@ -304,7 +302,7 @@ onMounted(async () => {
 })
 
 
-async function correct_photo(username){
+async function correct_photo(username:string){
   const {data: pic} = await supabase.from('profiles').select('profile_pic').eq('username',username )
   
   profile.value = pic
