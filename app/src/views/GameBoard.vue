@@ -26,7 +26,7 @@
         </div>
         <DeleteButton v-if="isCreator!=null":isCreator="isCreator"  @delete="handleDelete"/>
         
-        <button v-if="myTurn" @click ="game.turnOrder(id)" :disabled="isInitialPlacementPhase">end turn</button>
+        <button v-if="myTurn" @click ="game.turnOrder(id)" >end turn</button>
     </div>
 
     <div class="absolute bottom-0 z-10" >
@@ -162,28 +162,10 @@ if (
 tradeData.value = data
 initPlayerProfile.value = await use_profile.fetchUserById(use_profile.profile.id)
 }}
-const isInitialPlacementPhase = ref<boolean>(true)
-async function checkInitialPlacementStatus() {
-  if (!use_profile.profile?.id || !id.value) return
 
-  const { data, error } = await supabase
-    .from('settlements')
-    .select() 
-    .eq('player_id', use_profile.profile.id)
-    .eq('game_id', id.value)
-console.log("This is what im looking ofr",data)
-  if (error) {
-    console.error('Error checking placement status:', error)
-    return
-  }
-    console.log(isInitialPlacementPhase.value)
 
-  if(data.length>=2){
-    isInitialPlacementPhase.value=false
-        console.log(isInitialPlacementPhase.value)
+  
 
-  }
-}
 const initPlayerProfile=ref<profileType|null>(null)
 async function handlePlayerResponse(trade: Trade) {
   if (trade && use_profile.profile?.id && id.value) {
@@ -229,16 +211,10 @@ async function buildRoad(road:road){
   console.log(road)
 const {data,error}:{data:road[]|null,error:PostgrestError|null} =await supabase.from('roads').select().eq('player_id',use_profile.profile?.id).eq('game_id',id.value)
 
-await checkInitialPlacementStatus()
-console.log(isInitialPlacementPhase)
-if(isInitialPlacementPhase.value&&data&&data?.length>=2){
-  alert('Only two roads for now buddy')
-  return
-}
+
 const { data: settlementData,error:settlememt } = await supabase.from('settlements').select().eq('game_id', id.value).eq('player_id',use_profile.profile?.id)
 console.log('this is y settlement data',settlementData)
 console.log(settlememt)
-await checkInitialPlacementStatus()
 if(use_profile.profile?.id&&data&&settlementData){
   const check = await gameLoop().BuildRoad(use_profile.profile?.id,id.value,data,road,settlementData)
 if (check){
@@ -369,8 +345,7 @@ console.log(game.current_player)
     },
     async (payload) => {
       console.log("ts is settlements",payload)
-      await checkInitialPlacementStatus()
-      console.log(isInitialPlacementPhase)
+      
       const newSettlement = payload.new as Settlement
       console.log("HEY BOZO THIS IS THE THING")
       console.log(newSettlement)
