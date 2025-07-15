@@ -441,18 +441,16 @@ console.log(game.current_player)
 
       const newSettlement = payload.new as Settlement;
 
-      // Try to find and update the existing settlement
       let found = false;
 
       builtSettlements.value = builtSettlements.value.map(settlement => {
         if (settlement.id === newSettlement.id) {
           found = true;
-          return newSettlement; // Replace with the new version (might now be a city)
+          return newSettlement; 
         }
         return settlement;
       });
 
-      // If it wasn't found, push it as a new settlement
       if (!found) {
         builtSettlements.value.push(newSettlement);
       }
