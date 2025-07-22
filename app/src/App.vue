@@ -1,6 +1,7 @@
 <template>
   <div>
     <router-view></router-view>
+    <p>sigma</p>
   </div>
 </template>
 
